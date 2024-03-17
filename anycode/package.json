@@ -86,11 +86,11 @@
     "onCommand:workbench.action.showAllSymbols"
   ],
   "devDependencies": {
-    "@types/node": "^16.7.3",
-    "@vscode/test-web": "^0.0.8",
-    "esbuild": "^0.15.12",
-    "typescript": "^4.5.2",
-    "vsce": "^2.6.7"
+    "@types/node": "16.7.3",
+    "@vscode/test-web": "0.0.8",
+    "esbuild": "0.15.12",
+    "typescript": "4.5.2",
+    "vsce": "2.6.7"
   },
   "extensionPack": [
     "ms-vscode.anycode-c-sharp",

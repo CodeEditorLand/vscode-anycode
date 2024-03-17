@@ -39,7 +39,7 @@
     }
   },
   "devDependencies": {
-    "@playwright/test": "^1.14.1",
+    "@playwright/test": "1.14.1",
     "tree-sitter-cli": "0.22.1",
     "tree-sitter-python": "0.21.0"
   },
