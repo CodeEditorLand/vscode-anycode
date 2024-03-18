@@ -1,47 +1,54 @@
 {
-  "name": "anycode-python",
-  "displayName": "anycode-python",
-  "version": "0.0.5",
-  "description": "Python for Anycode",
-  "repository": {
-    "url": "https://github.com/microsoft/vscode-anycode"
-  },
-  "license": "MIT",
-  "publisher": "ms-vscode",
-  "scripts": {
-    "deploy": "npx vsce publish",
-    "postinstall": "npx tree-sitter build-wasm node_modules/tree-sitter-python"
-  },
-  "contributes": {
-    "anycodeLanguages": {
-      "extensions": [
-        "py",
-        "rpy",
-        "pyw",
-        "cpy",
-        "gyp",
-        "gypi",
-        "pyi",
-        "ipy"
-      ],
-      "grammarPath": "./tree-sitter-python.wasm",
-      "languageId": "python",
-      "queryPaths": {
-        "comments": "./queries/comments.scm",
-        "identifiers": "./queries/identifiers.scm",
-        "locals": "./queries/locals.scm",
-        "outline": "./queries/outline.scm",
-        "references": "./queries/references.scm"
-      },
-      "suppressedBy": [
-        "ms-python.python"
-      ]
-    }
-  },
-  "devDependencies": {
-    "@playwright/test": "1.14.1",
-    "tree-sitter-cli": "0.22.1",
-    "tree-sitter-python": "0.21.0"
-  },
-  "preview": true
+	"name": "anycode-python",
+	"publisher": "ms-vscode",
+	"displayName": "anycode-python",
+	"description": "Python for Anycode",
+	"license": "MIT",
+	"version": "0.0.5",
+	"preview": true,
+	"repository": {
+		"url": "https://github.com/microsoft/vscode-anycode"
+	},
+	"engines": {
+		"vscode": "^1.67.0"
+	},
+	"categories": [
+		"Programming Languages"
+	],
+	"contributes": {
+		"anycodeLanguages": {
+			"grammarPath": "./tree-sitter-python.wasm",
+			"languageId": "python",
+			"extensions": [
+				"py",
+				"rpy",
+				"pyw",
+				"cpy",
+				"gyp",
+				"gypi",
+				"pyi",
+				"ipy"
+			],
+			"queryPaths": {
+				"comments": "./queries/comments.scm",
+				"identifiers": "./queries/identifiers.scm",
+				"locals": "./queries/locals.scm",
+				"outline": "./queries/outline.scm",
+				"references": "./queries/references.scm"
+			},
+			"suppressedBy": [
+				"ms-python.python"
+			]
+		}
+	},
+	"scripts": {
+		"postinstall": "npx tree-sitter build-wasm node_modules/tree-sitter-python",
+		"deploy": "npx vsce publish",
+		"test": "node ../anycode/server/src/common/test-fixture/test.js  --outline ./fixtures/outline.ts --highlights ./fixtures/highlights.ts"
+	},
+	"devDependencies": {
+		"@playwright/test": "^1.42.1",
+		"tree-sitter-cli": "0.22.2",
+		"tree-sitter-python": "0.21.0"
+	}
 }

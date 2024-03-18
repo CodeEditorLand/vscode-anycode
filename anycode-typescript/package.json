@@ -1,40 +1,47 @@
 {
-  "name": "anycode-typescript",
-  "displayName": "anycode-typescript",
-  "version": "0.0.5",
-  "description": "TypeScript for Anycode",
-  "repository": {
-    "url": "https://github.com/microsoft/vscode-anycode"
-  },
-  "license": "MIT",
-  "publisher": "ms-vscode",
-  "scripts": {
-    "deploy": "npx vsce publish",
-    "postinstall": "npx tree-sitter build-wasm node_modules/tree-sitter-typescript/typescript"
-  },
-  "contributes": {
-    "anycodeLanguages": {
-      "extensions": [
-        "ts"
-      ],
-      "grammarPath": "./tree-sitter-typescript.wasm",
-      "languageId": "typescript",
-      "queryPaths": {
-        "comments": "./queries/comments.scm",
-        "identifiers": "./queries/identifiers.scm",
-        "locals": "./queries/locals.scm",
-        "outline": "./queries/outline.scm",
-        "references": "./queries/references.scm"
-      },
-      "suppressedBy": [
-        "vscode.typescript-language-features"
-      ]
-    }
-  },
-  "devDependencies": {
-    "@playwright/test": "1.14.1",
-    "tree-sitter-cli": "0.20.6",
-    "tree-sitter-typescript": "0.19.0"
-  },
-  "preview": true
+	"name": "anycode-typescript",
+	"publisher": "ms-vscode",
+	"displayName": "anycode-typescript",
+	"description": "TypeScript for Anycode",
+	"license": "MIT",
+	"version": "0.0.5",
+	"preview": true,
+	"repository": {
+		"url": "https://github.com/microsoft/vscode-anycode"
+	},
+	"engines": {
+		"vscode": "^1.67.0"
+	},
+	"categories": [
+		"Programming Languages"
+	],
+	"contributes": {
+		"anycodeLanguages": {
+			"grammarPath": "./tree-sitter-typescript.wasm",
+			"languageId": "typescript",
+			"extensions": [
+				"ts"
+			],
+			"queryPaths": {
+				"comments": "./queries/comments.scm",
+				"identifiers": "./queries/identifiers.scm",
+				"locals": "./queries/locals.scm",
+				"outline": "./queries/outline.scm",
+				"references": "./queries/references.scm"
+			},
+			"suppressedBy": [
+				"vscode.typescript-language-features"
+			]
+		}
+	},
+	"scripts": {
+		"postinstall": "npx tree-sitter build-wasm node_modules/tree-sitter-typescript/typescript",
+		"deploy": "npx vsce publish",
+		"test": "node ../anycode/server/src/common/test-fixture/test.js  --outline ./fixtures/outline.ts --highlights ./fixtures/highlights.ts"
+	},
+	"devDependencies": {
+		"@playwright/test": "^1.42.1",
+		"tree-sitter-cli": "0.22.2",
+		"tree-sitter-typescript": "0.20.5"
+	}
 }

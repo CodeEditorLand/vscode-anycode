@@ -1,40 +1,47 @@
 {
-  "name": "anycode-rust",
-  "displayName": "anycode-rust",
-  "version": "0.0.6",
-  "description": "Rust for Anycode",
-  "repository": {
-    "url": "https://github.com/microsoft/vscode-anycode"
-  },
-  "license": "MIT",
-  "publisher": "ms-vscode",
-  "scripts": {
-    "deploy": "npx vsce publish",
-    "postinstall": "npx tree-sitter build-wasm node_modules/tree-sitter-rust"
-  },
-  "contributes": {
-    "anycodeLanguages": {
-      "extensions": [
-        "rs"
-      ],
-      "grammarPath": "./tree-sitter-rust.wasm",
-      "languageId": "rust",
-      "queryPaths": {
-        "comments": "./queries/comments.scm",
-        "folding": "./queries/folding.scm",
-        "identifiers": "./queries/identifiers.scm",
-        "locals": "./queries/locals.scm",
-        "outline": "./queries/outline.scm",
-        "references": "./queries/references.scm"
-      },
-      "suppressedBy": [
-        "rust-lang.rust-analyzer"
-      ]
-    }
-  },
-  "devDependencies": {
-    "tree-sitter-cli": "0.22.1",
-    "tree-sitter-rust": "0.20.4"
-  },
-  "preview": true
+	"name": "anycode-rust",
+	"publisher": "ms-vscode",
+	"displayName": "anycode-rust",
+	"description": "Rust for Anycode",
+	"license": "MIT",
+	"version": "0.0.6",
+	"preview": true,
+	"repository": {
+		"url": "https://github.com/microsoft/vscode-anycode"
+	},
+	"engines": {
+		"vscode": "^1.67.0"
+	},
+	"categories": [
+		"Programming Languages"
+	],
+	"contributes": {
+		"anycodeLanguages": {
+			"grammarPath": "./tree-sitter-rust.wasm",
+			"languageId": "rust",
+			"extensions": [
+				"rs"
+			],
+			"queryPaths": {
+				"comments": "./queries/comments.scm",
+				"folding": "./queries/folding.scm",
+				"identifiers": "./queries/identifiers.scm",
+				"locals": "./queries/locals.scm",
+				"outline": "./queries/outline.scm",
+				"references": "./queries/references.scm"
+			},
+			"suppressedBy": [
+				"rust-lang.rust-analyzer"
+			]
+		}
+	},
+	"scripts": {
+		"postinstall": "npx tree-sitter build-wasm node_modules/tree-sitter-rust",
+		"deploy": "npx vsce publish",
+		"test": "node ../anycode/server/src/common/test-fixture/test.js --outline ./fixtures/outline.rs --highlights ./fixtures/highlights.rs"
+	},
+	"devDependencies": {
+		"tree-sitter-cli": "0.22.2",
+		"tree-sitter-rust": "0.20.4"
+	}
 }

@@ -1,40 +1,47 @@
 {
-  "name": "anycode-c-sharp",
-  "displayName": "anycode-c-sharp",
-  "version": "0.0.5",
-  "description": "C# for Anycode",
-  "repository": {
-    "url": "https://github.com/microsoft/vscode-anycode"
-  },
-  "license": "MIT",
-  "publisher": "ms-vscode",
-  "scripts": {
-    "deploy": "npx vsce publish",
-    "postinstall": "npx tree-sitter build-wasm node_modules/tree-sitter-c-sharp"
-  },
-  "contributes": {
-    "anycodeLanguages": {
-      "extensions": [
-        "cs"
-      ],
-      "grammarPath": "./tree-sitter-c_sharp.wasm",
-      "languageId": "csharp",
-      "queryPaths": {
-        "comments": "./queries/comments.scm",
-        "identifiers": "./queries/identifiers.scm",
-        "locals": "./queries/locals.scm",
-        "outline": "./queries/outline.scm",
-        "references": "./queries/references.scm"
-      },
-      "suppressedBy": [
-        "ms-dotnettools.csharp"
-      ]
-    }
-  },
-  "devDependencies": {
-    "@playwright/test": "1.14.1",
-    "tree-sitter-c-sharp": "0.19.0",
-    "tree-sitter-cli": "0.20.6"
-  },
-  "preview": true
+	"name": "anycode-c-sharp",
+	"publisher": "ms-vscode",
+	"displayName": "anycode-c-sharp",
+	"description": "C# for Anycode",
+	"license": "MIT",
+	"version": "0.0.5",
+	"preview": true,
+	"repository": {
+		"url": "https://github.com/microsoft/vscode-anycode"
+	},
+	"engines": {
+		"vscode": "^1.67.0"
+	},
+	"categories": [
+		"Programming Languages"
+	],
+	"contributes": {
+		"anycodeLanguages": {
+			"grammarPath": "./tree-sitter-c_sharp.wasm",
+			"languageId": "csharp",
+			"extensions": [
+				"cs"
+			],
+			"queryPaths": {
+				"comments": "./queries/comments.scm",
+				"identifiers": "./queries/identifiers.scm",
+				"locals": "./queries/locals.scm",
+				"outline": "./queries/outline.scm",
+				"references": "./queries/references.scm"
+			},
+			"suppressedBy": [
+				"ms-dotnettools.csharp"
+			]
+		}
+	},
+	"scripts": {
+		"postinstall": "npx tree-sitter build-wasm node_modules/tree-sitter-c-sharp",
+		"deploy": "npx vsce publish",
+		"test": "node ../anycode/server/src/common/test-fixture/test.js  --outline ./fixtures/outline.cs --highlights ./fixtures/highlights.cs"
+	},
+	"devDependencies": {
+		"@playwright/test": "^1.42.1",
+		"tree-sitter-cli": "0.22.2",
+		"tree-sitter-c-sharp": "0.20.0"
+	}
 }
