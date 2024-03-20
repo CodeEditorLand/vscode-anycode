@@ -1,29 +1,38 @@
 {
 	"name": "anycode-cpp",
-	"publisher": "ms-vscode",
 	"displayName": "anycode-cpp",
+	"version": "0.0.1",
+	"private": false,
 	"description": "C/C++ for Anycode",
-	"license": "MIT",
-	"version": "0.0.5",
-	"preview": true,
+	"homepage": "https://github.com/CodeEditorLand/Foundation#readme",
+	"bugs": {
+		"url": "https://github.com/CodeEditorLand/Foundation/issues"
+	},
 	"repository": {
-		"url": "https://github.com/microsoft/vscode-anycode"
+		"type": "git",
+		"url": "git+https://github.com/CodeEditorLand/Foundation.git"
 	},
-	"engines": {
-		"vscode": "1.67.0"
+	"license": "SEE LICENSE IN LICENSE",
+	"author": {
+		"name": "Playform",
+		"email": "Hello@Playform.Cloud",
+		"url": "https://playform.cloud"
 	},
-	"categories": [
-		"Programming Languages"
-	],
+	"type": "module",
+	"scripts": {
+		"deploy": "npx vsce publish",
+		"postinstall": "npx tree-sitter build-wasm node_modules/tree-sitter-c && npx tree-sitter build-wasm node_modules/tree-sitter-cpp",
+		"prepublishOnly": "TypeScriptESBuild 'Source/**/*.ts'"
+	},
 	"contributes": {
 		"anycodeLanguages": [
 			{
-				"grammarPath": "./tree-sitter-c.wasm",
-				"languageId": "c",
 				"extensions": [
 					"c",
 					"i"
 				],
+				"grammarPath": "./tree-sitter-c.wasm",
+				"languageId": "c",
 				"queryPaths": {
 					"comments": "./queries/c/comments.scm",
 					"identifiers": "./queries/c/identifiers.scm",
@@ -34,8 +43,6 @@
 				]
 			},
 			{
-				"grammarPath": "./tree-sitter-cpp.wasm",
-				"languageId": "cpp",
 				"extensions": [
 					"cpp",
 					"cc",
@@ -54,6 +61,8 @@
 					"hpp.in",
 					"h.in"
 				],
+				"grammarPath": "./tree-sitter-cpp.wasm",
+				"languageId": "cpp",
 				"queryPaths": {
 					"comments": "./queries/cpp/comments.scm",
 					"identifiers": "./queries/cpp/identifiers.scm",
@@ -65,15 +74,15 @@
 			}
 		]
 	},
-	"scripts": {
-		"postinstall": "npx tree-sitter build-wasm node_modules/tree-sitter-c && npx tree-sitter build-wasm node_modules/tree-sitter-cpp",
-		"deploy": "npx vsce publish",
-		"test": "node ../anycode/server/src/common/test-fixture/test.js  --outline ./fixtures/outline.c"
-	},
 	"devDependencies": {
 		"@playwright/test": "1.42.1",
+		"tree-sitter-c": "0.21.0",
 		"tree-sitter-cli": "0.22.2",
 		"tree-sitter-cpp": "0.20.5",
-		"tree-sitter-c": "0.21.0"
-	}
+		"typescript-esbuild": "latest"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"preview": true
 }

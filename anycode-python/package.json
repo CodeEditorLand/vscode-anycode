@@ -1,24 +1,31 @@
 {
 	"name": "anycode-python",
-	"publisher": "ms-vscode",
 	"displayName": "anycode-python",
+	"version": "0.0.1",
+	"private": false,
 	"description": "Python for Anycode",
-	"license": "MIT",
-	"version": "0.0.5",
-	"preview": true,
+	"homepage": "https://github.com/CodeEditorLand/Foundation#readme",
+	"bugs": {
+		"url": "https://github.com/CodeEditorLand/Foundation/issues"
+	},
 	"repository": {
-		"url": "https://github.com/microsoft/vscode-anycode"
+		"type": "git",
+		"url": "git+https://github.com/CodeEditorLand/Foundation.git"
 	},
-	"engines": {
-		"vscode": "1.67.0"
+	"license": "SEE LICENSE IN LICENSE",
+	"author": {
+		"name": "Playform",
+		"email": "Hello@Playform.Cloud",
+		"url": "https://playform.cloud"
 	},
-	"categories": [
-		"Programming Languages"
-	],
+	"type": "module",
+	"scripts": {
+		"deploy": "npx vsce publish",
+		"postinstall": "npx tree-sitter build-wasm node_modules/tree-sitter-python",
+		"prepublishOnly": "TypeScriptESBuild 'Source/**/*.ts'"
+	},
 	"contributes": {
 		"anycodeLanguages": {
-			"grammarPath": "./tree-sitter-python.wasm",
-			"languageId": "python",
 			"extensions": [
 				"py",
 				"rpy",
@@ -29,6 +36,8 @@
 				"pyi",
 				"ipy"
 			],
+			"grammarPath": "./tree-sitter-python.wasm",
+			"languageId": "python",
 			"queryPaths": {
 				"comments": "./queries/comments.scm",
 				"identifiers": "./queries/identifiers.scm",
@@ -41,14 +50,14 @@
 			]
 		}
 	},
-	"scripts": {
-		"postinstall": "npx tree-sitter build-wasm node_modules/tree-sitter-python",
-		"deploy": "npx vsce publish",
-		"test": "node ../anycode/server/src/common/test-fixture/test.js  --outline ./fixtures/outline.ts --highlights ./fixtures/highlights.ts"
-	},
 	"devDependencies": {
 		"@playwright/test": "1.42.1",
 		"tree-sitter-cli": "0.22.2",
-		"tree-sitter-python": "0.21.0"
-	}
+		"tree-sitter-python": "0.21.0",
+		"typescript-esbuild": "latest"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"preview": true
 }

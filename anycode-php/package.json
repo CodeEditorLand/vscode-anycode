@@ -1,24 +1,31 @@
 {
 	"name": "anycode-php",
-	"publisher": "ms-vscode",
 	"displayName": "anycode-php",
+	"version": "0.0.1",
+	"private": false,
 	"description": "PHP for Anycode",
-	"license": "MIT",
-	"version": "0.0.6",
-	"preview": true,
+	"homepage": "https://github.com/CodeEditorLand/Foundation#readme",
+	"bugs": {
+		"url": "https://github.com/CodeEditorLand/Foundation/issues"
+	},
 	"repository": {
-		"url": "https://github.com/microsoft/vscode-anycode"
+		"type": "git",
+		"url": "git+https://github.com/CodeEditorLand/Foundation.git"
 	},
-	"engines": {
-		"vscode": "1.67.0"
+	"license": "SEE LICENSE IN LICENSE",
+	"author": {
+		"name": "Playform",
+		"email": "Hello@Playform.Cloud",
+		"url": "https://playform.cloud"
 	},
-	"categories": [
-		"Programming Languages"
-	],
+	"type": "module",
+	"scripts": {
+		"deploy": "npx vsce publish",
+		"postinstall": "npx tree-sitter build-wasm node_modules/tree-sitter-php",
+		"prepublishOnly": "TypeScriptESBuild 'Source/**/*.ts'"
+	},
 	"contributes": {
 		"anycodeLanguages": {
-			"grammarPath": "./tree-sitter-php.wasm",
-			"languageId": "php",
 			"extensions": [
 				"php",
 				"php4",
@@ -26,6 +33,8 @@
 				"phtml",
 				"ctp"
 			],
+			"grammarPath": "./tree-sitter-php.wasm",
+			"languageId": "php",
 			"queryPaths": {
 				"comments": "./queries/comments.scm",
 				"identifiers": "./queries/identifiers.scm",
@@ -38,14 +47,14 @@
 			]
 		}
 	},
-	"scripts": {
-		"postinstall": "npx tree-sitter build-wasm node_modules/tree-sitter-php",
-		"deploy": "npx vsce publish",
-		"test": "node ../anycode/server/src/common/test-fixture/test.js --highlights ./fixtures/highlights.php"
-	},
 	"devDependencies": {
 		"@playwright/test": "1.42.1",
 		"tree-sitter-cli": "0.22.2",
-		"tree-sitter-php": "0.22.2"
-	}
+		"tree-sitter-php": "0.22.2",
+		"typescript-esbuild": "latest"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"preview": true
 }

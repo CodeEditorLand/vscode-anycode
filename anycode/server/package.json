@@ -1,10 +1,25 @@
 {
 	"name": "anycode-client",
-	"license": "MIT",
-	"publisher": "ms-vscode",
+	"version": "0.0.1",
+	"private": false,
+	"homepage": "https://github.com/CodeEditorLand/Foundation#readme",
+	"bugs": {
+		"url": "https://github.com/CodeEditorLand/Foundation/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/CodeEditorLand/Foundation.git"
+	},
+	"license": "SEE LICENSE IN LICENSE",
+	"author": {
+		"name": "Playform",
+		"email": "Hello@Playform.Cloud",
+		"url": "https://playform.cloud"
+	},
+	"type": "module",
 	"scripts": {
 		"postinstall": "npx playwright install-deps",
-		"test": "npx mocha --ui tdd src/**/test/*.test.js"
+		"prepublishOnly": "TypeScriptESBuild 'Source/**/*.ts'"
 	},
 	"dependencies": {
 		"vscode-languageserver": "9.0.1",
@@ -17,7 +32,11 @@
 		"@types/mocha": "10.0.6",
 		"assert": "2.1.0",
 		"mocha": "10.3.0",
+		"typescript-esbuild": "latest",
 		"web-tree-sitter": "0.22.2",
 		"yargs": "17.7.2"
+	},
+	"publishConfig": {
+		"access": "public"
 	}
 }

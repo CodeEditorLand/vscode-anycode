@@ -1,38 +1,36 @@
 {
 	"name": "anycode-kotlin",
-	"publisher": "ms-vscode",
 	"displayName": "anycode-kotlin",
+	"version": "0.0.1",
+	"private": false,
 	"description": "Kotlin for Anycode",
-	"license": "MIT",
-	"version": "0.0.5",
-	"preview": true,
+	"homepage": "https://github.com/CodeEditorLand/Foundation#readme",
+	"bugs": {
+		"url": "https://github.com/CodeEditorLand/Foundation/issues"
+	},
 	"repository": {
-		"url": "https://github.com/microsoft/vscode-anycode"
+		"type": "git",
+		"url": "git+https://github.com/CodeEditorLand/Foundation.git"
 	},
-	"engines": {
-		"vscode": "1.67.0"
+	"license": "SEE LICENSE IN LICENSE",
+	"author": {
+		"name": "Playform",
+		"email": "Hello@Playform.Cloud",
+		"url": "https://playform.cloud"
 	},
-	"categories": [
-		"Programming Languages"
-	],
+	"type": "module",
+	"scripts": {
+		"deploy": "npx vsce publish",
+		"postinstall": "npx tree-sitter build-wasm node_modules/tree-sitter-kotlin",
+		"prepublishOnly": "TypeScriptESBuild 'Source/**/*.ts'"
+	},
 	"contributes": {
-		"languages": [
-			{
-				"id": "kotlin",
-				"extensions": [
-					"kt"
-				],
-				"aliases": [
-					"kotlin"
-				]
-			}
-		],
 		"anycodeLanguages": {
-			"grammarPath": "./tree-sitter-kotlin.wasm",
-			"languageId": "kotlin",
 			"extensions": [
 				"kt"
 			],
+			"grammarPath": "./tree-sitter-kotlin.wasm",
+			"languageId": "kotlin",
 			"queryPaths": {
 				"comments": "./queries/comments.scm",
 				"folding": "./queries/folding.scm",
@@ -41,15 +39,26 @@
 				"outline": "./queries/outline.scm",
 				"references": "./queries/references.scm"
 			}
-		}
-	},
-	"scripts": {
-		"postinstall": "npx tree-sitter build-wasm node_modules/tree-sitter-kotlin",
-		"deploy": "npx vsce publish",
-		"test": "node ../anycode/server/src/common/test-fixture/test.js --outline ./fixtures/outline.kt"
+		},
+		"languages": [
+			{
+				"aliases": [
+					"kotlin"
+				],
+				"extensions": [
+					"kt"
+				],
+				"id": "kotlin"
+			}
+		]
 	},
 	"devDependencies": {
 		"tree-sitter-cli": "0.22.2",
-		"tree-sitter-kotlin": "git+https://github.com/fwcd/tree-sitter-kotlin.git#a4f71eb9b8c9b19ded3e0e9470be4b1b77c2b569"
-	}
+		"tree-sitter-kotlin": "git+https://github.com/fwcd/tree-sitter-kotlin.git#a4f71eb9b8c9b19ded3e0e9470be4b1b77c2b569",
+		"typescript-esbuild": "latest"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"preview": true
 }
