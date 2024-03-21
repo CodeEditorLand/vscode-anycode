@@ -32,7 +32,7 @@
 		"@types/mocha": "10.0.6",
 		"assert": "2.1.0",
 		"mocha": "10.3.0",
-		"typescript-esbuild": "latest",
+		"typescript-esbuild": "0.4.5",
 		"web-tree-sitter": "0.22.2",
 		"yargs": "17.7.2"
 	},

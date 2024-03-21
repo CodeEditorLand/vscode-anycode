@@ -55,7 +55,7 @@
 	"devDependencies": {
 		"tree-sitter-cli": "0.22.2",
 		"tree-sitter-kotlin": "git+https://github.com/fwcd/tree-sitter-kotlin.git#a4f71eb9b8c9b19ded3e0e9470be4b1b77c2b569",
-		"typescript-esbuild": "latest"
+		"typescript-esbuild": "0.4.5"
 	},
 	"publishConfig": {
 		"access": "public"

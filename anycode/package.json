@@ -103,7 +103,7 @@
 		"@vscode/test-web": "0.0.52",
 		"esbuild": "0.20.2",
 		"typescript": "5.4.2",
-		"typescript-esbuild": "latest",
+		"typescript-esbuild": "0.4.5",
 		"vsce": "2.6.7"
 	},
 	"extensionPack": [
