@@ -1,11 +1,28 @@
 {
-	"author": {
-		"email": "Hello@Playform.Cloud",
-		"name": "Playform",
-		"url": "https://playform.cloud"
-	},
+	"name": "anycode-kotlin",
+	"displayName": "anycode-kotlin",
+	"version": "0.0.1",
+	"private": false,
+	"description": "Kotlin for Anycode",
+	"homepage": "https://github.com/CodeEditorLand/Foundation#readme",
 	"bugs": {
 		"url": "https://github.com/CodeEditorLand/Foundation/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/CodeEditorLand/Foundation.git"
+	},
+	"license": "SEE LICENSE IN LICENSE",
+	"author": {
+		"name": "Playform",
+		"email": "Hello@Playform.Cloud",
+		"url": "https://playform.cloud"
+	},
+	"type": "module",
+	"scripts": {
+		"deploy": "npx vsce publish",
+		"postinstall": "npx tree-sitter build-wasm node_modules/tree-sitter-kotlin",
+		"prepublishOnly": "TypeScriptESBuild 'Source/**/*.ts'"
 	},
 	"contributes": {
 		"anycodeLanguages": {
@@ -35,30 +52,13 @@
 			}
 		]
 	},
-	"description": "Kotlin for Anycode",
 	"devDependencies": {
 		"tree-sitter-cli": "0.22.2",
 		"tree-sitter-kotlin": "git+https://github.com/fwcd/tree-sitter-kotlin.git#a4f71eb9b8c9b19ded3e0e9470be4b1b77c2b569",
-		"typescript-esbuild": ""
+		"typescript-esbuild": "0.4.5"
 	},
-	"displayName": "anycode-kotlin",
-	"homepage": "https://github.com/CodeEditorLand/Foundation#readme",
-	"license": "SEE LICENSE IN LICENSE",
-	"name": "anycode-kotlin",
-	"preview": true,
-	"private": false,
 	"publishConfig": {
 		"access": "public"
 	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/CodeEditorLand/Foundation.git"
-	},
-	"scripts": {
-		"deploy": "npx vsce publish",
-		"postinstall": "npx tree-sitter build-wasm node_modules/tree-sitter-kotlin",
-		"prepublishOnly": "TypeScriptESBuild 'Source/**/*.ts'"
-	},
-	"type": "module",
-	"version": "0.0.1"
+	"preview": true
 }
