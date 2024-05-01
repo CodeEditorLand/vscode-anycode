@@ -28,8 +28,8 @@
 	"devDependencies": {
 		"@playform/build": "0.0.7",
 		"@playform/document": "0.0.6",
-		"@types/node": "17.0.25",
-		"assert": "~2.0.0"
+		"@types/node": "20.12.7",
+		"assert": "2.1.0"
 	},
 	"publishConfig": {
 		"access": "public"

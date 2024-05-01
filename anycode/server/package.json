@@ -28,11 +28,11 @@
 	"devDependencies": {
 		"@playform/build": "0.0.7",
 		"@playform/document": "0.0.6",
-		"@types/assert": "^1.5.6",
-		"@types/chai": "^4.2.21",
-		"assert": "~2.0.0",
-		"web-tree-sitter": "0.20.8",
-		"yargs": "^17.3.1"
+		"@types/assert": "1.5.10",
+		"@types/chai": "4.3.14",
+		"assert": "2.1.0",
+		"web-tree-sitter": "0.22.5",
+		"yargs": "17.7.2"
 	},
 	"publishConfig": {
 		"access": "public"

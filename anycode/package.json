@@ -102,8 +102,8 @@
 	"devDependencies": {
 		"@playform/build": "0.0.7",
 		"@playform/document": "0.0.6",
-		"@types/node": "^16.7.3",
-		"esbuild": "^0.15.12"
+		"@types/node": "20.12.7",
+		"esbuild": "0.20.2"
 	},
 	"extensionPack": [
 		"ms-vscode.anycode-c-sharp",
