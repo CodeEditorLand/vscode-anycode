@@ -4,32 +4,33 @@
 	"version": "0.0.1",
 	"private": false,
 	"description": "",
-	"homepage": "https://github.com/CodeEditorLand/Foundation#readme",
+	"keywords": [
+		"land"
+	],
+	"homepage": "HTTPS://GitHub.Com/CodeEditorLand/LandAnycode#readme",
 	"bugs": {
-		"url": "https://github.com/CodeEditorLand/Foundation/issues"
+		"url": "HTTPS://GitHub.Com/CodeEditorLand/LandAnycode/issues"
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/CodeEditorLand/Foundation.git"
+		"url": "git+HTTPS://github.com/CodeEditorLand/LandAnycode.git"
 	},
 	"license": "SEE LICENSE IN LICENSE",
 	"author": {
-		"name": "Playform",
-		"email": "Hello@Playform.Cloud",
-		"url": "https://playform.cloud"
+		"name": "🌆 — Land —",
+		"email": "Land@PlayForm.Cloud",
+		"url": "HTTPS://Land.PlayForm.Cloud"
 	},
 	"type": "module",
 	"main": "./dist/anycode.extension.node.js",
 	"browser": "./dist/anycode.extension.browser.js",
 	"scripts": {
+		"Document": "Document 'Source/**/*.ts'",
 		"compile": "tsc -b tsconfig.json && node esbuild.js",
 		"deploy": "npx vsce publish --noVerify",
-		"postinstall": "cd client && npm install && cd ../server && npm install && cd .. && node esbuild.js",
-		"prepublishOnly": "TypeScriptESBuild 'Source/**/*.ts'",
+		"prepublishOnly": "Build 'Source/**/*.ts'",
 		"pretest-extension": "npx esbuild client/src/test/suite/index.ts --bundle --external:vscode --target=es2020 --format=cjs --outfile=dist/extension.test.js --define:process=\"{\\\"env\\\":{}}\"",
-		"test-server": "cd server && npm run test",
-		"vscode:prepublish": "npm run compile",
-		"watch": "node esbuild.js --watch"
+		"test-server": "cd server && npm run test"
 	},
 	"contributes": {
 		"configuration": {
@@ -99,12 +100,10 @@
 		"onCommand:workbench.action.showAllSymbols"
 	],
 	"devDependencies": {
-		"@types/node": "20.11.30",
-		"@vscode/test-web": "0.0.52",
-		"esbuild": "0.20.2",
-		"typescript": "5.4.2",
-		"typescript-esbuild": "0.4.5",
-		"vsce": "2.6.7"
+		"@playform/build": "0.0.7",
+		"@playform/document": "0.0.6",
+		"@types/node": "20.12.7",
+		"esbuild": "0.20.2"
 	},
 	"extensionPack": [
 		"ms-vscode.anycode-c-sharp",
