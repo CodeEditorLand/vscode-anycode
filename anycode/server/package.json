@@ -29,9 +29,9 @@
 		"@playform/build": "0.0.7",
 		"@playform/document": "0.0.6",
 		"@types/assert": "1.5.10",
-		"@types/chai": "4.3.14",
+		"@types/chai": "4.3.16",
 		"assert": "2.1.0",
-		"web-tree-sitter": "0.22.5",
+		"web-tree-sitter": "0.22.6",
 		"yargs": "17.7.2"
 	},
 	"publishConfig": {

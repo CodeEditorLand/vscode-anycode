@@ -49,8 +49,8 @@
 	"devDependencies": {
 		"@playform/build": "0.0.7",
 		"@playform/document": "0.0.6",
-		"tree-sitter-c-sharp": "0.20.0",
-		"tree-sitter-cli": "0.22.5"
+		"tree-sitter-c-sharp": "0.21.1",
+		"tree-sitter-cli": "0.22.6"
 	},
 	"publishConfig": {
 		"access": "public"
