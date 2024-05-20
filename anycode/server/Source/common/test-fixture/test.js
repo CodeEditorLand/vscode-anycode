@@ -134,7 +134,7 @@ async function runTests() {
 	const page = await context.newPage();
 
 	const mochaDone = new Promise((resolve, reject) => {
-		page.exposeFunction('report_mocha_done', ( failCount) => {
+		page.exposeFunction('report_mocha_done', (/** @type {number|string} */ failCount) => {
 			resolve(failCount)
 		})
 		if (!args.debug) {
