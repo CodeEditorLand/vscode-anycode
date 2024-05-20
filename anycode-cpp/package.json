@@ -1,21 +1,29 @@
 {
 	"name": "anycode-cpp",
+	"publisher": "ms-vscode",
 	"displayName": "anycode-cpp",
 	"description": "C/C++ for Anycode",
-	"scripts": {
-		"Document": "Document 'Source/**/*.ts'",
-		"deploy": "npx vsce publish",
-		"prepublishOnly": "Build 'Source/**/*.ts'"
+	"license": "MIT",
+	"version": "0.0.6",
+	"preview": true,
+	"repository": {
+		"url": "https://github.com/microsoft/vscode-anycode"
 	},
+	"engines": {
+		"vscode": "^1.67.0"
+	},
+	"categories": [
+		"Programming Languages"
+	],
 	"contributes": {
 		"anycodeLanguages": [
 			{
+				"grammarPath": "./tree-sitter-c.wasm",
+				"languageId": "c",
 				"extensions": [
 					"c",
 					"i"
 				],
-				"grammarPath": "./tree-sitter-c.wasm",
-				"languageId": "c",
 				"queryPaths": {
 					"comments": "./queries/c/comments.scm",
 					"identifiers": "./queries/c/identifiers.scm",
@@ -26,6 +34,8 @@
 				]
 			},
 			{
+				"grammarPath": "./tree-sitter-cpp.wasm",
+				"languageId": "cpp",
 				"extensions": [
 					"cpp",
 					"cc",
@@ -44,8 +54,6 @@
 					"hpp.in",
 					"h.in"
 				],
-				"grammarPath": "./tree-sitter-cpp.wasm",
-				"languageId": "cpp",
 				"queryPaths": {
 					"comments": "./queries/cpp/comments.scm",
 					"identifiers": "./queries/cpp/identifiers.scm",
@@ -57,11 +65,15 @@
 			}
 		]
 	},
-	"devDependencies": {
-		"@playform/build": "0.0.7",
-		"tree-sitter-c": "0.21.0",
-		"tree-sitter-cli": "0.22.6",
-		"tree-sitter-cpp": "0.22.0"
+	"scripts": {
+		"postinstall": "npx tree-sitter build-wasm node_modules/tree-sitter-c && npx tree-sitter build-wasm node_modules/tree-sitter-cpp",
+		"deploy": "npx vsce publish",
+		"test": "node ../anycode/server/src/common/test-fixture/test.js  --outline ./fixtures/outline.c"
 	},
-	"preview": true
+	"devDependencies": {
+		"@playwright/test": "^1.14.1",
+		"tree-sitter-cli": "^0.20.8",
+		"tree-sitter-cpp": "^0.20.5",
+		"tree-sitter-c": "^0.20.8"
+	}
 }

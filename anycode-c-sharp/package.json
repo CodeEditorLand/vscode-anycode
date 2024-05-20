@@ -1,19 +1,27 @@
 {
 	"name": "anycode-c-sharp",
+	"publisher": "ms-vscode",
 	"displayName": "anycode-c-sharp",
 	"description": "C# for Anycode",
-	"scripts": {
-		"Document": "Document 'Source/**/*.ts'",
-		"deploy": "npx vsce publish",
-		"prepublishOnly": "Build 'Source/**/*.ts'"
+	"license": "MIT",
+	"version": "0.0.6",
+	"preview": true,
+	"repository": {
+		"url": "https://github.com/microsoft/vscode-anycode"
 	},
+	"engines": {
+		"vscode": "^1.67.0"
+	},
+	"categories": [
+		"Programming Languages"
+	],
 	"contributes": {
 		"anycodeLanguages": {
+			"grammarPath": "./tree-sitter-c_sharp.wasm",
+			"languageId": "csharp",
 			"extensions": [
 				"cs"
 			],
-			"grammarPath": "./tree-sitter-c_sharp.wasm",
-			"languageId": "csharp",
 			"queryPaths": {
 				"comments": "./queries/comments.scm",
 				"identifiers": "./queries/identifiers.scm",
@@ -26,10 +34,14 @@
 			]
 		}
 	},
-	"devDependencies": {
-		"@playform/build": "0.0.7",
-		"tree-sitter-c-sharp": "0.21.1",
-		"tree-sitter-cli": "0.22.6"
+	"scripts": {
+		"postinstall": "npx tree-sitter build-wasm node_modules/tree-sitter-c-sharp",
+		"deploy": "npx vsce publish",
+		"test": "node ../anycode/server/src/common/test-fixture/test.js  --outline ./fixtures/outline.cs --highlights ./fixtures/highlights.cs"
 	},
-	"preview": true
+	"devDependencies": {
+		"@playwright/test": "^1.14.1",
+		"tree-sitter-cli": "^0.20.8",
+		"tree-sitter-c-sharp": "^0.20.0"
+	}
 }
