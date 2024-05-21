@@ -34,8 +34,8 @@
 		]
 	},
 	"devDependencies": {
-		"@swimm/tree-sitter-kotlin": "^0.3.2",
-		"tree-sitter-cli": "^0.20.8"
+		"@swimm/tree-sitter-kotlin": "0.3.2",
+		"tree-sitter-cli": "0.20.8"
 	},
 	"preview": true
 }
