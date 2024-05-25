@@ -3,29 +3,40 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import * as lsp from 'vscode-languageserver';
-import { identifierAtPosition } from '../common';
-import { DocumentStore } from '../documentStore';
-import Languages from '../languages';
-import { Trees } from '../trees';
-import { Locals } from './locals';
-import { SymbolIndex } from './symbolIndex';
+import * as lsp from "vscode-languageserver";
+import { identifierAtPosition } from "../common";
+import type { DocumentStore } from "../documentStore";
+import Languages from "../languages";
+import type { Trees } from "../trees";
+import { Locals } from "./locals";
+import type { SymbolIndex } from "./symbolIndex";
 
 export class DefinitionProvider {
-
 	constructor(
 		private readonly _documents: DocumentStore,
 		private readonly _trees: Trees,
-		private readonly _symbols: SymbolIndex
-	) { }
+		private readonly _symbols: SymbolIndex,
+	) {}
 
 	register(connection: lsp.Connection) {
-		connection.client.register(lsp.DefinitionRequest.type, { documentSelector: Languages.getSupportedLanguages('definitions', ['locals', 'outline']) });
-		connection.onRequest(lsp.DefinitionRequest.type, this.provideDefinitions.bind(this));
+		connection.client.register(lsp.DefinitionRequest.type, {
+			documentSelector: Languages.getSupportedLanguages("definitions", [
+				"locals",
+				"outline",
+			]),
+		});
+		connection.onRequest(
+			lsp.DefinitionRequest.type,
+			this.provideDefinitions.bind(this),
+		);
 	}
 
-	async provideDefinitions(params: lsp.DefinitionParams): Promise<lsp.Location[]> {
-		const document = await this._documents.retrieve(params.textDocument.uri);
+	async provideDefinitions(
+		params: lsp.DefinitionParams,
+	): Promise<lsp.Location[]> {
+		const document = await this._documents.retrieve(
+			params.textDocument.uri,
+		);
 
 		// find definition in file
 		const info = await Locals.create(document, this._trees);
@@ -34,7 +45,9 @@ export class DefinitionProvider {
 			// find definition inside this file
 			const definitions = anchor.scope.findDefinitions(anchor.name);
 			if (definitions.length > 0) {
-				return definitions.map(def => lsp.Location.create(document.uri, def.range));
+				return definitions.map((def) =>
+					lsp.Location.create(document.uri, def.range),
+				);
 			}
 		}
 
@@ -44,14 +57,18 @@ export class DefinitionProvider {
 			return [];
 		}
 
-		const query = Languages.getQuery(tree.getLanguage(), 'identifiers');
-		const ident = identifierAtPosition(query, tree.rootNode, params.position)?.text;
+		const query = Languages.getQuery(tree.getLanguage(), "identifiers");
+		const ident = identifierAtPosition(
+			query,
+			tree.rootNode,
+			params.position,
+		)?.text;
 		if (!ident) {
 			// not an identifier
 			return [];
 		}
 
 		const symbols = await this._symbols.getDefinitions(ident, document);
-		return symbols.map(s => s.location);
+		return symbols.map((s) => s.location);
 	}
 }

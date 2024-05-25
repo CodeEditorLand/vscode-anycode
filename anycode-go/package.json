@@ -7,9 +7,7 @@
 	},
 	"contributes": {
 		"anycodeLanguages": {
-			"extensions": [
-				"go"
-			],
+			"extensions": ["go"],
 			"grammarPath": "./tree-sitter-go.wasm",
 			"languageId": "go",
 			"queryPaths": {
@@ -19,9 +17,7 @@
 				"outline": "./queries/outline.scm",
 				"references": "./queries/references.scm"
 			},
-			"suppressedBy": [
-				"golang.Go"
-			]
+			"suppressedBy": ["golang.Go"]
 		}
 	},
 	"devDependencies": {

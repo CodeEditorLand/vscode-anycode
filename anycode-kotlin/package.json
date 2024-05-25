@@ -7,9 +7,7 @@
 	},
 	"contributes": {
 		"anycodeLanguages": {
-			"extensions": [
-				"kt"
-			],
+			"extensions": ["kt"],
 			"grammarPath": "./tree-sitter-kotlin.wasm",
 			"languageId": "kotlin",
 			"queryPaths": {
@@ -23,12 +21,8 @@
 		},
 		"languages": [
 			{
-				"aliases": [
-					"kotlin"
-				],
-				"extensions": [
-					"kt"
-				],
+				"aliases": ["kotlin"],
+				"extensions": ["kt"],
 				"id": "kotlin"
 			}
 		]

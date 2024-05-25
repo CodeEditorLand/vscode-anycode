@@ -7,9 +7,7 @@
 	},
 	"contributes": {
 		"anycodeLanguages": {
-			"extensions": [
-				"cs"
-			],
+			"extensions": ["cs"],
 			"grammarPath": "./tree-sitter-c_sharp.wasm",
 			"languageId": "csharp",
 			"queryPaths": {
@@ -19,9 +17,7 @@
 				"outline": "./queries/outline.scm",
 				"references": "./queries/references.scm"
 			},
-			"suppressedBy": [
-				"ms-dotnettools.csharp"
-			]
+			"suppressedBy": ["ms-dotnettools.csharp"]
 		}
 	},
 	"devDependencies": {

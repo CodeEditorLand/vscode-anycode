@@ -3,57 +3,65 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import * as documentHighlights from './documentHighlights.test';
-import * as documentSymbols from './documentSymbols.test';
-import * as queries from './queries.test';
-import Parser from 'web-tree-sitter';
-import Languages from '../../languages';
-import { FeatureConfig, LanguageData, LanguageInfo } from '../../../../../shared/common/initOptions';
-import { encodeBase64 } from '../../../../../shared/common/base64';
+import Parser from "web-tree-sitter";
+import { encodeBase64 } from "../../../../../shared/common/base64";
+import {
+	type FeatureConfig,
+	LanguageData,
+	type LanguageInfo,
+} from "../../../../../shared/common/initOptions";
+import Languages from "../../languages";
+import * as documentHighlights from "./documentHighlights.test";
+import * as documentSymbols from "./documentSymbols.test";
+import * as queries from "./queries.test";
 
-(async function () {
-
+(async () => {
 	try {
-
 		await Parser.init({
 			locateFile() {
-				return '/anycode/server/node_modules/web-tree-sitter/tree-sitter.wasm';
-			}
+				return "/anycode/server/node_modules/web-tree-sitter/tree-sitter.wasm";
+			},
 		});
 
 		const config: [LanguageInfo, FeatureConfig][] = [];
 
 		// @ts-expect-error
 		const target = new URL(window.location);
-		const langInfo: LanguageInfo[] = JSON.parse(target.searchParams.get('languages') ?? "");
+		const langInfo: LanguageInfo[] = JSON.parse(
+			target.searchParams.get("languages") ?? "",
+		);
 
-		for (let info of langInfo) {
+		for (const info of langInfo) {
 			config.push([info, {}]);
 			queries.init(info);
 		}
 
 		Languages.init(config);
 
-		for (let info of langInfo) {
+		for (const info of langInfo) {
 			const data = await fetch((<any>info).wasmUri);
-			const base64 = encodeBase64(new Uint8Array(await data.arrayBuffer()));
-			Languages.setLanguageData(info.languageId, new LanguageData(base64, info.queryInfo));
+			const base64 = encodeBase64(
+				new Uint8Array(await data.arrayBuffer()),
+			);
+			Languages.setLanguageData(
+				info.languageId,
+				new LanguageData(base64, info.queryInfo),
+			);
 		}
 
-		const outline = target.searchParams.get('outline');
+		const outline = target.searchParams.get("outline");
 		if (outline) {
 			const langId = Languages.getLanguageIdByUri(outline);
 			await documentSymbols.init(outline, langId);
 		}
 
-		const highlights = target.searchParams.get('highlights');
+		const highlights = target.searchParams.get("highlights");
 		if (highlights) {
 			const langId = Languages.getLanguageIdByUri(highlights);
 			await documentHighlights.init(highlights, langId);
 		}
 
 		run(); // MOCHA-delayed run
-
 	} catch (err) {
 		// @ts-expect-error
 		window.report_mocha_done(err);

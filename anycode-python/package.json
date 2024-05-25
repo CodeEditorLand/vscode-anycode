@@ -26,9 +26,7 @@
 				"outline": "./queries/outline.scm",
 				"references": "./queries/references.scm"
 			},
-			"suppressedBy": [
-				"ms-python.python"
-			]
+			"suppressedBy": ["ms-python.python"]
 		}
 	},
 	"devDependencies": {

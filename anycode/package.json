@@ -79,7 +79,7 @@
 	],
 	"devDependencies": {
 		"@types/node": "20.12.12",
-		"esbuild": "0.21.3"
+		"esbuild": "0.21.4"
 	},
 	"extensionPack": [
 		"ms-vscode.anycode-c-sharp",
@@ -100,7 +100,5 @@
 		},
 		"virtualWorkspaces": true
 	},
-	"enabledApiProposals": [
-		"extensionsAny"
-	]
+	"enabledApiProposals": ["extensionsAny"]
 }

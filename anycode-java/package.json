@@ -7,9 +7,7 @@
 	},
 	"contributes": {
 		"anycodeLanguages": {
-			"extensions": [
-				"java"
-			],
+			"extensions": ["java"],
 			"grammarPath": "./tree-sitter-java.wasm",
 			"languageId": "java",
 			"queryPaths": {
@@ -20,9 +18,7 @@
 				"outline": "./queries/outline.scm",
 				"references": "./queries/references.scm"
 			},
-			"suppressedBy": [
-				"redhat.java"
-			]
+			"suppressedBy": ["redhat.java"]
 		}
 	},
 	"devDependencies": {

@@ -3,18 +3,20 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { Connection, SymbolKind } from "vscode-languageserver";
-import { SymbolInfoStorage, SymbolInfo } from "../common/features/symbolIndex";
+import type { Connection, SymbolKind } from "vscode-languageserver";
+import type {
+	SymbolInfo,
+	SymbolInfoStorage,
+} from "../common/features/symbolIndex";
 
 export class FileSymbolStorage implements SymbolInfoStorage {
-
 	private readonly _data = new Map<string, Array<string | number>>();
 
-	constructor(private readonly _connection: Connection) { }
+	constructor(private readonly _connection: Connection) {}
 
 	insert(uri: string, info: Map<string, SymbolInfo>): void {
 		const flatInfo: Array<string | number> = [];
-		for (let [word, i] of info) {
+		for (const [word, i] of info) {
 			flatInfo.push(word);
 			flatInfo.push(i.definitions.size);
 			flatInfo.push(...i.definitions);
@@ -35,37 +37,51 @@ export class FileSymbolStorage implements SymbolInfoStorage {
 
 	private _saveSoon() {
 		clearTimeout(this._saveTimer);
-		this._saveTimer = setTimeout(() => { this.flush(); }, 50);
+		this._saveTimer = setTimeout(() => {
+			this.flush();
+		}, 50);
 	}
 
 	flush() {
 		const raw = JSON.stringify(Array.from(this._data.entries()));
-		this._connection.sendRequest('persisted/write', raw).catch(err => console.error(err));
+		this._connection
+			.sendRequest("persisted/write", raw)
+			.catch((err) => console.error(err));
 	}
 
 	async getAll(): Promise<Map<string, Map<string, SymbolInfo>>> {
-
 		this._data.clear();
 
 		const result = new Map<string, Map<string, SymbolInfo>>();
 		try {
-			const raw = await this._connection.sendRequest<string>('persisted/read');
+			const raw =
+				await this._connection.sendRequest<string>("persisted/read");
 			const data = <[string, Array<string | number>][]>JSON.parse(raw);
 
-			for (let [uri, flatInfo] of data) {
+			for (const [uri, flatInfo] of data) {
 				this._data.set(uri, flatInfo);
 				const info = new Map<string, SymbolInfo>();
 				result.set(uri, info);
-				for (let i = 0; i < flatInfo.length;) {
-					let word = (<string>flatInfo[i]);
-					let defLen = (<number>flatInfo[++i]);
-					let kindStart = ++i;
+				for (let i = 0; i < flatInfo.length; ) {
+					const word = <string>flatInfo[i];
+					const defLen = <number>flatInfo[++i];
+					const kindStart = ++i;
 
-					for (; i < flatInfo.length && typeof flatInfo[i] === 'number'; i++) { ; }
+					for (
+						;
+						i < flatInfo.length && typeof flatInfo[i] === "number";
+						i++
+					) {}
 
 					info.set(word, {
-						definitions: new Set(<SymbolKind[]>flatInfo.slice(kindStart, kindStart + defLen)),
-						usages: new Set(<SymbolKind[]>flatInfo.slice(kindStart + defLen, i))
+						definitions: new Set(
+							<SymbolKind[]>(
+								flatInfo.slice(kindStart, kindStart + defLen)
+							),
+						),
+						usages: new Set(
+							<SymbolKind[]>flatInfo.slice(kindStart + defLen, i),
+						),
 					});
 				}
 			}

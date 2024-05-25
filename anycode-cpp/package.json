@@ -8,10 +8,7 @@
 	"contributes": {
 		"anycodeLanguages": [
 			{
-				"extensions": [
-					"c",
-					"i"
-				],
+				"extensions": ["c", "i"],
 				"grammarPath": "./tree-sitter-c.wasm",
 				"languageId": "c",
 				"queryPaths": {
@@ -19,9 +16,7 @@
 					"identifiers": "./queries/c/identifiers.scm",
 					"outline": "./queries/c/outline.scm"
 				},
-				"suppressedBy": [
-					"ms-vscode.cpptools"
-				]
+				"suppressedBy": ["ms-vscode.cpptools"]
 			},
 			{
 				"extensions": [
@@ -49,16 +44,14 @@
 					"identifiers": "./queries/cpp/identifiers.scm",
 					"outline": "./queries/cpp/outline.scm"
 				},
-				"suppressedBy": [
-					"ms-vscode.cpptools"
-				]
+				"suppressedBy": ["ms-vscode.cpptools"]
 			}
 		]
 	},
 	"devDependencies": {
-		"tree-sitter-c": "0.21.0",
+		"tree-sitter-c": "0.21.3",
 		"tree-sitter-cli": "0.22.6",
-		"tree-sitter-cpp": "0.22.0"
+		"tree-sitter-cpp": "0.22.1"
 	},
 	"preview": true
 }

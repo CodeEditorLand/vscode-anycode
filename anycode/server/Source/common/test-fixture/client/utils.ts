@@ -3,66 +3,67 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import Languages from '../../languages';
-import * as lsp from "vscode-languageserver";
+import type * as lsp from "vscode-languageserver";
+import { TextDocument } from "vscode-languageserver-textdocument";
 import { DocumentStore } from "../../documentStore";
-import { TextDocument } from 'vscode-languageserver-textdocument';
-import { Trees } from '../../trees';
+import Languages from "../../languages";
+import { Trees } from "../../trees";
 
-export function mock<T>(): { new(): T } {
-	return function () { } as any;
+export function mock<T>(): { new (): T } {
+	return (() => {}) as any;
 }
 
 export class TestDocumentStore extends DocumentStore {
-
 	constructor(...docs: TextDocument[]) {
 		super(
-			new class extends mock<lsp.Connection>() {
-				onDidOpenTextDocument(handler: lsp.NotificationHandler<lsp.DidOpenTextDocumentParams>) {
-					for (let doc of docs) {
+			new (class extends mock<lsp.Connection>() {
+				onDidOpenTextDocument(
+					handler: lsp.NotificationHandler<lsp.DidOpenTextDocumentParams>,
+				) {
+					for (const doc of docs) {
 						handler({
 							textDocument: {
 								languageId: doc.languageId,
 								uri: doc.uri,
 								text: doc.getText(),
-								version: doc.version
-							}
+								version: doc.version,
+							},
 						});
 					}
 				}
-				onDidChangeTextDocument() { }
-				onDidCloseTextDocument() { }
-				onWillSaveTextDocument() { }
-				onWillSaveTextDocumentWaitUntil() { }
-				onDidSaveTextDocument() { }
-				onNotification() { }
-			}
+				onDidChangeTextDocument() {}
+				onDidCloseTextDocument() {}
+				onWillSaveTextDocument() {}
+				onWillSaveTextDocumentWaitUntil() {}
+				onDidSaveTextDocument() {}
+				onNotification() {}
+			})(),
 		);
 	}
 }
 
 export class FixtureMarks {
-
 	static readonly pattern = /\[\[[^\]]+\]\]/g;
 
 	constructor(
 		readonly start: number,
-		readonly text: string
-	) { }
+		readonly text: string,
+	) {}
 }
 
 export class Fixture {
-
 	static async parse(uri: string, languageId: string) {
-
 		const res = await fetch(uri);
 		const text = await res.text();
 
 		const r = /.+###.*/gu;
 		const names = text.match(r);
-		const documents = text.split(r)
+		const documents = text
+			.split(r)
 			.filter(Boolean)
-			.map((value, i) => TextDocument.create(`${uri}#${i}`, languageId, 1, value));
+			.map((value, i) =>
+				TextDocument.create(`${uri}#${i}`, languageId, 1, value),
+			);
 
 		const store = new TestDocumentStore(...documents);
 		const trees = new Trees(store);
@@ -74,10 +75,18 @@ export class Fixture {
 			if (!tree) {
 				throw new Error();
 			}
-			const query = Languages.getQuery(tree.getLanguage(), 'comments', true);
+			const query = Languages.getQuery(
+				tree.getLanguage(),
+				"comments",
+				true,
+			);
 
-			const name = names?.shift()?.replace(/^.+###/, '').trim() ?? doc.uri;
-			if (name.includes('/SKIP/')) {
+			const name =
+				names
+					?.shift()
+					?.replace(/^.+###/, "")
+					.trim() ?? doc.uri;
+			if (name.includes("/SKIP/")) {
 				continue;
 			}
 
@@ -85,15 +94,22 @@ export class Fixture {
 			const captures = query.captures(tree.rootNode);
 
 			for (const capture of captures) {
-				const start = capture.node.text.indexOf('^');
+				const start = capture.node.text.indexOf("^");
 				if (start < 0) {
 					continue;
 				}
 
-				const end = capture.node.text.lastIndexOf('^');
+				const end = capture.node.text.lastIndexOf("^");
 
-				for (let row = capture.node.startPosition.row - 1; row >= 0; row--) {
-					let node = tree.rootNode.descendantForPosition({ row, column: start }, { row, column: end });
+				for (
+					let row = capture.node.startPosition.row - 1;
+					row >= 0;
+					row--
+				) {
+					const node = tree.rootNode.descendantForPosition(
+						{ row, column: start },
+						{ row, column: end },
+					);
 					if (query.captures(node).length > 0) {
 						// skip stacked comments
 						continue;
@@ -113,6 +129,6 @@ export class Fixture {
 	constructor(
 		readonly name: string,
 		readonly document: TextDocument,
-		readonly marks: FixtureMarks[]
-	) { }
-};
+		readonly marks: FixtureMarks[],
+	) {}
+}

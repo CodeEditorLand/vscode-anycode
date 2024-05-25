@@ -7,9 +7,7 @@
 	},
 	"contributes": {
 		"anycodeLanguages": {
-			"extensions": [
-				"rs"
-			],
+			"extensions": ["rs"],
 			"grammarPath": "./tree-sitter-rust.wasm",
 			"languageId": "rust",
 			"queryPaths": {
@@ -20,9 +18,7 @@
 				"outline": "./queries/outline.scm",
 				"references": "./queries/references.scm"
 			},
-			"suppressedBy": [
-				"rust-lang.rust-analyzer"
-			]
+			"suppressedBy": ["rust-lang.rust-analyzer"]
 		}
 	},
 	"devDependencies": {
