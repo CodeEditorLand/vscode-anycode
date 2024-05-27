@@ -1,15 +1,27 @@
 {
 	"name": "anycode-java",
+	"publisher": "ms-vscode",
 	"displayName": "anycode-java",
 	"description": "Java for Anycode",
-	"scripts": {
-		"deploy": "npx vsce publish"
+	"license": "MIT",
+	"version": "0.0.6",
+	"preview": true,
+	"repository": {
+		"url": "https://github.com/microsoft/vscode-anycode"
 	},
+	"engines": {
+		"vscode": "^1.67.0"
+	},
+	"categories": [
+		"Programming Languages"
+	],
 	"contributes": {
 		"anycodeLanguages": {
-			"extensions": ["java"],
 			"grammarPath": "./tree-sitter-java.wasm",
 			"languageId": "java",
+			"extensions": [
+				"java"
+			],
 			"queryPaths": {
 				"comments": "./queries/comments.scm",
 				"folding": "./queries/folding.scm",
@@ -18,12 +30,18 @@
 				"outline": "./queries/outline.scm",
 				"references": "./queries/references.scm"
 			},
-			"suppressedBy": ["redhat.java"]
+			"suppressedBy": [
+				"redhat.java"
+			]
 		}
 	},
-	"devDependencies": {
-		"tree-sitter-cli": "0.22.6",
-		"tree-sitter-java": "0.21.0"
+	"scripts": {
+		"postinstall": "npx tree-sitter build-wasm node_modules/tree-sitter-java",
+		"deploy": "npx vsce publish",
+		"test": "node ../anycode/server/src/common/test-fixture/test.js --outline ./fixtures/outline.java --highlights ./fixtures/highlights.java"
 	},
-	"preview": true
+	"devDependencies": {
+		"tree-sitter-cli": "^0.20.8",
+		"tree-sitter-java": "^0.20.2"
+	}
 }
