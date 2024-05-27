@@ -3,39 +3,29 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import * as lsp from "vscode-languageserver";
-import { nodeAtPosition } from "../common";
-import type { DocumentStore } from "../documentStore";
-import Languages from "../languages";
-import type { Trees } from "../trees";
-import type { SymbolIndex } from "./symbolIndex";
+import * as lsp from 'vscode-languageserver';
+import { DocumentStore } from '../documentStore';
+import Languages from '../languages';
+import { Trees } from '../trees';
+import { nodeAtPosition } from '../common';
+import { SymbolIndex } from './symbolIndex';
 
 export class CompletionItemProvider {
+
 	constructor(
 		private readonly _documents: DocumentStore,
 		private readonly _trees: Trees,
-		private _symbols: SymbolIndex,
-	) {}
+		private _symbols: SymbolIndex
+	) { }
 
 	register(connection: lsp.Connection) {
-		connection.client.register(lsp.CompletionRequest.type, {
-			documentSelector: Languages.getSupportedLanguages("completions", [
-				"identifiers",
-				"outline",
-			]),
-		});
-		connection.onRequest(
-			lsp.CompletionRequest.type,
-			this.provideCompletionItems.bind(this),
-		);
+		connection.client.register(lsp.CompletionRequest.type, { documentSelector: Languages.getSupportedLanguages('completions', ['identifiers', 'outline']) });
+		connection.onRequest(lsp.CompletionRequest.type, this.provideCompletionItems.bind(this));
 	}
 
-	async provideCompletionItems(
-		params: lsp.CompletionParams,
-	): Promise<lsp.CompletionItem[]> {
-		const document = await this._documents.retrieve(
-			params.textDocument.uri,
-		);
+	async provideCompletionItems(params: lsp.CompletionParams): Promise<lsp.CompletionItem[]> {
+
+		const document = await this._documents.retrieve(params.textDocument.uri);
 		const tree = await this._trees.getParseTree(document);
 		if (!tree) {
 			return [];
@@ -44,12 +34,13 @@ export class CompletionItemProvider {
 		const result = new Map<string, lsp.CompletionItem>();
 
 		// (1) all identifiers that are used in this file
-		const query = Languages.getQuery(tree.getLanguage(), "identifiers");
+		const query = Languages.getQuery(tree.getLanguage(), 'identifiers');
 		const captures = query.captures(tree.rootNode);
 		for (const capture of captures) {
 			const text = capture.node.text;
 			result.set(text, { label: text });
 		}
+
 
 		// (2) all definitions that are known in this project (override less specific local identifiers)
 
@@ -63,9 +54,7 @@ export class CompletionItemProvider {
 					const [firstDefinitionKind] = info.definitions;
 					result.set(name, {
 						label: name,
-						kind: CompletionItemProvider._kindMapping.get(
-							firstDefinitionKind,
-						),
+						kind: CompletionItemProvider._kindMapping.get(firstDefinitionKind)
 					});
 					break;
 				}
@@ -82,10 +71,7 @@ export class CompletionItemProvider {
 		return Array.from(result.values());
 	}
 
-	private static _kindMapping = new Map<
-		lsp.SymbolKind,
-		lsp.CompletionItemKind
-	>([
+	private static _kindMapping = new Map<lsp.SymbolKind, lsp.CompletionItemKind>([
 		[lsp.SymbolKind.Class, lsp.CompletionItemKind.Class],
 		[lsp.SymbolKind.Interface, lsp.CompletionItemKind.Interface],
 		[lsp.SymbolKind.Field, lsp.CompletionItemKind.Field],

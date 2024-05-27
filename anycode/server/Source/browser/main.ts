@@ -3,17 +3,10 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import {
-	BrowserMessageReader,
-	BrowserMessageWriter,
-	createConnection,
-} from "vscode-languageserver/browser";
-import {
-	MemorySymbolStorage,
-	type SymbolInfoStorage,
-} from "../common/features/symbolIndex";
-import { type IStorageFactory, startServer } from "../common/server";
-import { IndexedDBSymbolStorage } from "./storage";
+import { BrowserMessageReader, BrowserMessageWriter, createConnection } from 'vscode-languageserver/browser';
+import { MemorySymbolStorage, SymbolInfoStorage } from '../common/features/symbolIndex';
+import { IStorageFactory, startServer } from '../common/server';
+import { IndexedDBSymbolStorage } from './storage';
 
 const messageReader = new BrowserMessageReader(self);
 const messageWriter = new BrowserMessageWriter(self);
@@ -27,9 +20,7 @@ const factory: IStorageFactory = {
 			await result.open();
 			return result;
 		} catch (e) {
-			console.error(
-				"FAILED to create indexedDB-based storage, using volatile in-memory storage INSTEAD",
-			);
+			console.error('FAILED to create indexedDB-based storage, using volatile in-memory storage INSTEAD');
 			return new MemorySymbolStorage();
 		}
 	},
@@ -37,7 +28,7 @@ const factory: IStorageFactory = {
 		if (obj instanceof IndexedDBSymbolStorage) {
 			await obj.close();
 		}
-	},
+	}
 };
 
 startServer(connection, factory);

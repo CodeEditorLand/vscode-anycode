@@ -3,77 +3,66 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import * as lsp from "vscode-languageserver";
-import type Parser from "web-tree-sitter";
+import * as lsp from 'vscode-languageserver';
+import type Parser from 'web-tree-sitter';
 
 export type SymbolMapping = {
-	getSymbolKind(
-		symbolKind: string,
-		strict: boolean,
-	): lsp.SymbolKind | undefined;
+	getSymbolKind(symbolKind: string, strict: boolean): lsp.SymbolKind | undefined;
 	getSymbolKind(symbolKind: string): lsp.SymbolKind;
 };
 
-export const symbolMapping: SymbolMapping = new (class {
+export const symbolMapping: SymbolMapping = new class {
+
 	private readonly _symbolKindMapping = new Map<string, lsp.SymbolKind>([
-		["file", lsp.SymbolKind.File],
-		["module", lsp.SymbolKind.Module],
-		["namespace", lsp.SymbolKind.Namespace],
-		["package", lsp.SymbolKind.Package],
-		["class", lsp.SymbolKind.Class],
-		["method", lsp.SymbolKind.Method],
-		["property", lsp.SymbolKind.Property],
-		["field", lsp.SymbolKind.Field],
-		["constructor", lsp.SymbolKind.Constructor],
-		["enum", lsp.SymbolKind.Enum],
-		["interface", lsp.SymbolKind.Interface],
-		["function", lsp.SymbolKind.Function],
-		["variable", lsp.SymbolKind.Variable],
-		["constant", lsp.SymbolKind.Constant],
-		["string", lsp.SymbolKind.String],
-		["number", lsp.SymbolKind.Number],
-		["boolean", lsp.SymbolKind.Boolean],
-		["array", lsp.SymbolKind.Array],
-		["object", lsp.SymbolKind.Object],
-		["key", lsp.SymbolKind.Key],
-		["null", lsp.SymbolKind.Null],
-		["enumMember", lsp.SymbolKind.EnumMember],
-		["struct", lsp.SymbolKind.Struct],
-		["event", lsp.SymbolKind.Event],
-		["operator", lsp.SymbolKind.Operator],
-		["typeParameter", lsp.SymbolKind.TypeParameter],
+		['file', lsp.SymbolKind.File],
+		['module', lsp.SymbolKind.Module],
+		['namespace', lsp.SymbolKind.Namespace],
+		['package', lsp.SymbolKind.Package],
+		['class', lsp.SymbolKind.Class],
+		['method', lsp.SymbolKind.Method],
+		['property', lsp.SymbolKind.Property],
+		['field', lsp.SymbolKind.Field],
+		['constructor', lsp.SymbolKind.Constructor],
+		['enum', lsp.SymbolKind.Enum],
+		['interface', lsp.SymbolKind.Interface],
+		['function', lsp.SymbolKind.Function],
+		['variable', lsp.SymbolKind.Variable],
+		['constant', lsp.SymbolKind.Constant],
+		['string', lsp.SymbolKind.String],
+		['number', lsp.SymbolKind.Number],
+		['boolean', lsp.SymbolKind.Boolean],
+		['array', lsp.SymbolKind.Array],
+		['object', lsp.SymbolKind.Object],
+		['key', lsp.SymbolKind.Key],
+		['null', lsp.SymbolKind.Null],
+		['enumMember', lsp.SymbolKind.EnumMember],
+		['struct', lsp.SymbolKind.Struct],
+		['event', lsp.SymbolKind.Event],
+		['operator', lsp.SymbolKind.Operator],
+		['typeParameter', lsp.SymbolKind.TypeParameter],
 	]);
 
 	getSymbolKind(symbolKind: string): lsp.SymbolKind;
 	getSymbolKind(symbolKind: string, strict: true): lsp.SymbolKind | undefined;
-	getSymbolKind(
-		symbolKind: string,
-		strict?: true,
-	): lsp.SymbolKind | undefined {
+	getSymbolKind(symbolKind: string, strict?: true): lsp.SymbolKind | undefined {
+
 		const res = this._symbolKindMapping.get(symbolKind);
 		if (!res && strict) {
 			return undefined;
 		}
 		return res ?? lsp.SymbolKind.Variable;
 	}
-})();
+};
+
 
 // --- geometry
 
 export function asLspRange(node: Parser.SyntaxNode): lsp.Range {
-	return lsp.Range.create(
-		node.startPosition.row,
-		node.startPosition.column,
-		node.endPosition.row,
-		node.endPosition.column,
-	);
+	return lsp.Range.create(node.startPosition.row, node.startPosition.column, node.endPosition.row, node.endPosition.column);
 }
 
-export function identifierAtPosition(
-	identQuery: Parser.Query,
-	node: Parser.SyntaxNode,
-	position: lsp.Position,
-): Parser.SyntaxNode | undefined {
+export function identifierAtPosition(identQuery: Parser.Query, node: Parser.SyntaxNode, position: lsp.Position): Parser.SyntaxNode | undefined {
+
 	// `foo|::bar` -> finds `::`
 	let candidate = nodeAtPosition(node, position, false);
 	let capture = identQuery.captures(candidate);
@@ -90,11 +79,7 @@ export function identifierAtPosition(
 	return undefined;
 }
 
-export function nodeAtPosition(
-	node: Parser.SyntaxNode,
-	position: lsp.Position,
-	leftBias = false,
-): Parser.SyntaxNode {
+export function nodeAtPosition(node: Parser.SyntaxNode, position: lsp.Position, leftBias: boolean = false): Parser.SyntaxNode {
 	for (const child of node.children) {
 		const range = asLspRange(child);
 		if (isBeforeOrEqual(range.start, position)) {
@@ -144,35 +129,19 @@ export function compareRangeByStart(a: lsp.Range, b: lsp.Range): number {
 	return 0;
 }
 
-export function containsPosition(
-	range: lsp.Range,
-	position: lsp.Position,
-): boolean {
-	return (
-		isBeforeOrEqual(range.start, position) &&
-		isBeforeOrEqual(position, range.end)
-	);
+export function containsPosition(range: lsp.Range, position: lsp.Position): boolean {
+	return isBeforeOrEqual(range.start, position) && isBeforeOrEqual(position, range.end);
 }
 
-export function containsPositionStrict(
-	range: lsp.Range,
-	position: lsp.Position,
-): boolean {
+export function containsPositionStrict(range: lsp.Range, position: lsp.Position): boolean {
 	return isBefore(range.start, position) && isBefore(position, range.end);
 }
 
 export function containsRange(range: lsp.Range, other: lsp.Range): boolean {
-	return (
-		containsPosition(range, other.start) &&
-		containsPosition(range, other.end)
-	);
+	return containsPosition(range, other.start) && containsPosition(range, other.end);
 }
 
-export function containsLocation(
-	loc: lsp.Location,
-	uri: string,
-	position: lsp.Position,
-) {
+export function containsLocation(loc: lsp.Location, uri: string, position: lsp.Position) {
 	return loc.uri === uri && containsPosition(loc.range, position);
 }
 
@@ -192,24 +161,18 @@ export function isInteresting(uri: string): boolean {
 	return !/^(git|github|vsls|review):/i.test(uri);
 }
 
-export async function parallel<R>(
-	tasks: ((token: lsp.CancellationToken) => Promise<R>)[],
-	degree: number,
-	token: lsp.CancellationToken,
-): Promise<R[]> {
-	const result: R[] = [];
+export async function parallel<R>(tasks: ((token: lsp.CancellationToken) => Promise<R>)[], degree: number, token: lsp.CancellationToken): Promise<R[]> {
+	let result: R[] = [];
 	let pos = 0;
 	while (true) {
 		if (token.isCancellationRequested) {
-			throw new Error("cancelled");
+			throw new Error('cancelled');
 		}
 		const partTasks = tasks.slice(pos, pos + degree);
 		if (partTasks.length === 0) {
 			break;
 		}
-		const partResult = await Promise.all(
-			partTasks.map((task) => task(token)),
-		);
+		const partResult = await Promise.all(partTasks.map(task => task(token)));
 		pos += degree;
 		result.push(...partResult);
 	}

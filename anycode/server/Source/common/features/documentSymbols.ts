@@ -3,47 +3,31 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import * as lsp from "vscode-languageserver";
-import type { TextDocument } from "vscode-languageserver-textdocument";
-import type { QueryCapture } from "web-tree-sitter";
-import { asLspRange, containsRange, symbolMapping } from "../common";
-import type { DocumentStore } from "../documentStore";
-import Languages from "../languages";
-import type { Trees } from "../trees";
+import * as lsp from 'vscode-languageserver';
+import { TextDocument } from 'vscode-languageserver-textdocument';
+import { QueryCapture } from 'web-tree-sitter';
+import { asLspRange, containsRange, symbolMapping } from '../common';
+import { DocumentStore } from '../documentStore';
+import Languages from '../languages';
+import { Trees } from '../trees';
 
 export class DocumentSymbols {
-	constructor(
-		private readonly _documents: DocumentStore,
-		private readonly _trees: Trees,
-	) {}
+
+	constructor(private readonly _documents: DocumentStore, private readonly _trees: Trees) { }
 
 	register(connection: lsp.Connection) {
-		connection.client.register(lsp.DocumentSymbolRequest.type, {
-			documentSelector: Languages.getSupportedLanguages("outline", [
-				"outline",
-			]),
-		});
-		connection.onRequest(
-			lsp.DocumentSymbolRequest.type,
-			this.provideDocumentSymbols.bind(this),
-		);
+		connection.client.register(lsp.DocumentSymbolRequest.type, { documentSelector: Languages.getSupportedLanguages('outline', ['outline']) });
+		connection.onRequest(lsp.DocumentSymbolRequest.type, this.provideDocumentSymbols.bind(this));
 	}
 
-	async provideDocumentSymbols(
-		params: lsp.DocumentSymbolParams,
-	): Promise<lsp.DocumentSymbol[]> {
-		const document = await this._documents.retrieve(
-			params.textDocument.uri,
-		);
+	async provideDocumentSymbols(params: lsp.DocumentSymbolParams): Promise<lsp.DocumentSymbol[]> {
+		const document = await this._documents.retrieve(params.textDocument.uri);
 		return getDocumentSymbols(document, this._trees, false);
 	}
 }
 
-export async function getDocumentSymbols(
-	document: TextDocument,
-	trees: Trees,
-	flat: boolean,
-): Promise<lsp.DocumentSymbol[]> {
+export async function getDocumentSymbols(document: TextDocument, trees: Trees, flat: boolean): Promise<lsp.DocumentSymbol[]> {
+
 	class Node {
 		readonly range: lsp.Range;
 		readonly children: Node[] = [];
@@ -56,10 +40,11 @@ export async function getDocumentSymbols(
 	if (!tree) {
 		return [];
 	}
-	const query = Languages.getQuery(tree.getLanguage(), "outline");
+	const query = Languages.getQuery(tree.getLanguage(), 'outline');
 	const captures = query.captures(tree.rootNode);
 
-	// build a Node-tree that is based on range containment. This includes true
+
+	// build a Node-tree that is based on range containment. This includes true 
 	// children as well as the "name-child"
 	const roots: Node[] = [];
 	const stack: Node[] = [];
@@ -86,14 +71,10 @@ export async function getDocumentSymbols(
 	// the `<xyz>.name` capture name are used as identifier/name and aren't producing
 	// a dedicated document symbol
 	function build(node: Node, bucket: lsp.DocumentSymbol[]): void {
-		const children: lsp.DocumentSymbol[] = [];
+		let children: lsp.DocumentSymbol[] = [];
 		let nameNode: Node | undefined;
-		for (const child of node.children) {
-			if (
-				!nameNode &&
-				child.capture.name.endsWith(".name") &&
-				child.capture.name.startsWith(node.capture.name)
-			) {
+		for (let child of node.children) {
+			if (!nameNode && child.capture.name.endsWith('.name') && child.capture.name.startsWith(node.capture.name)) {
 				nameNode = child;
 			} else {
 				build(child, children);
@@ -102,20 +83,15 @@ export async function getDocumentSymbols(
 		if (!nameNode) {
 			nameNode = node;
 		}
-		const symbol = lsp.DocumentSymbol.create(
-			nameNode.capture.node.text,
-			"",
-			symbolMapping.getSymbolKind(node.capture.name),
-			node.range,
-			nameNode.range,
-		);
+		const symbol = lsp.DocumentSymbol.create(nameNode.capture.node.text, '', symbolMapping.getSymbolKind(node.capture.name), node.range, nameNode.range);
 		symbol.children = children;
 
 		bucket.push(symbol);
 	}
 
+
 	const result: lsp.DocumentSymbol[] = [];
-	for (const node of roots) {
+	for (let node of roots) {
 		build(node, result);
 	}
 
@@ -125,7 +101,7 @@ export async function getDocumentSymbols(
 
 	const flatResult: lsp.DocumentSymbol[] = [];
 	(function flatten(all: lsp.DocumentSymbol[]) {
-		for (const item of all) {
+		for (let item of all) {
 			flatResult.push(item);
 			if (item.children) {
 				flatten(item.children);

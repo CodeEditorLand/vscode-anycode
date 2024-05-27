@@ -3,11 +3,9 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+
 class Entry<E> {
-	constructor(
-		readonly key: string,
-		public value: E,
-	) {}
+	constructor(readonly key: string, public value: E) { }
 }
 
 export interface ReadonlyTrie<E> {
@@ -18,18 +16,16 @@ export interface ReadonlyTrie<E> {
 }
 
 export class Trie<E> implements ReadonlyTrie<E> {
+
 	static create<E>(): Trie<E> {
-		return new Trie("", undefined);
+		return new Trie('', undefined);
 	}
 
-	private _size = 0;
-	private _depth = 0;
+	private _size: number = 0;
+	private _depth: number = 0;
 	private readonly _children = new Map<string, Trie<E>>();
 
-	private constructor(
-		readonly ch: string,
-		public element: Entry<E> | undefined,
-	) {}
+	private constructor(readonly ch: string, public element: Entry<E> | undefined) { }
 
 	get size() {
 		return this._size;
@@ -40,7 +36,7 @@ export class Trie<E> implements ReadonlyTrie<E> {
 	}
 
 	set(str: string, element: E): void {
-		const chars = Array.from(str);
+		let chars = Array.from(str);
 		let node: Trie<E> = this;
 		for (let pos = 0; pos < chars.length; pos++) {
 			node._depth = Math.max(chars.length - pos, node._depth);
@@ -52,20 +48,20 @@ export class Trie<E> implements ReadonlyTrie<E> {
 			}
 			node = child;
 		}
-		if (node.element) {
-			node.element.value = element;
-		} else {
+		if (!node.element) {
 			this._size += 1;
 			node.element = new Entry(str, element);
+		} else {
+			node.element.value = element;
 		}
 	}
 
 	get(str: string): E | undefined {
-		const chars = Array.from(str);
+		let chars = Array.from(str);
 		let node: Trie<E> = this;
 		for (let pos = 0; pos < chars.length; pos++) {
 			const ch = chars[pos];
-			const child = node._children.get(ch);
+			let child = node._children.get(ch);
 			if (!child) {
 				return undefined;
 			}
@@ -75,12 +71,12 @@ export class Trie<E> implements ReadonlyTrie<E> {
 	}
 
 	delete(str: string): boolean {
-		const chars = Array.from(str);
+		let chars = Array.from(str);
 		let node: Trie<E> = this;
-		const path: [string, Trie<E>][] = [];
+		let path: [string, Trie<E>][] = [];
 		for (let pos = 0; pos < chars.length; pos++) {
 			const ch = chars[pos];
-			const child = node._children.get(ch);
+			let child = node._children.get(ch);
 			if (!child) {
 				return false;
 			}
@@ -109,7 +105,7 @@ export class Trie<E> implements ReadonlyTrie<E> {
 				node._depth = 0;
 			} else {
 				let newDepth = 0;
-				for (const child of node._children.values()) {
+				for (let child of node._children.values()) {
 					newDepth = Math.max(newDepth, child.depth);
 				}
 				node._depth = 1 + newDepth;
@@ -120,16 +116,12 @@ export class Trie<E> implements ReadonlyTrie<E> {
 	}
 
 	*query(str: string[]): IterableIterator<[string, E]> {
+
 		const bucket = new Set<Trie<E>>();
 		const cache = new Map<Trie<E>, Map<number, boolean>>();
 
-		const _query = (
-			node: Trie<E>,
-			str: string[],
-			pos: number,
-			skipped: number,
-			lastCh: string,
-		) => {
+		const _query = (node: Trie<E>, str: string[], pos: number, skipped: number, lastCh: string) => {
+
 			if (bucket.has(node)) {
 				return;
 			}
@@ -161,7 +153,7 @@ export class Trie<E> implements ReadonlyTrie<E> {
 			}
 
 			// match & recurse
-			for (const [ch, child] of node._children) {
+			for (let [ch, child] of node._children) {
 				if (ch.toLowerCase() === str[pos].toLowerCase()) {
 					// consume query character if
 					_query(child, str, pos + 1, skipped, ch);
@@ -172,7 +164,7 @@ export class Trie<E> implements ReadonlyTrie<E> {
 
 		_query(this, str, 0, 0, this.ch);
 
-		for (const item of bucket) {
+		for (let item of bucket) {
 			yield* item;
 		}
 	}
@@ -184,7 +176,7 @@ export class Trie<E> implements ReadonlyTrie<E> {
 			if (node.element) {
 				yield [node.element.key, node.element.value];
 			}
-			for (const child of node._children.values()) {
+			for (let child of node._children.values()) {
 				stack.push(child);
 			}
 		}
