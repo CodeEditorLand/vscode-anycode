@@ -27,8 +27,8 @@
 	},
 	"description": "Python for Anycode",
 	"devDependencies": {
-		"tree-sitter-cli": "^0.20.8",
-		"tree-sitter-python": "^0.20.4"
+		"tree-sitter-cli": "^0.22.6",
+		"tree-sitter-python": "^0.21.0"
 	},
 	"displayName": "anycode-python",
 	"name": "anycode-python",
