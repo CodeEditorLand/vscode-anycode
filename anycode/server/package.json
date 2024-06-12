@@ -1,11 +1,11 @@
 {
 	"dependencies": {},
 	"devDependencies": {
-		"@types/assert": "^1.5.10",
-		"@types/chai": "^4.3.16",
-		"assert": "~2.1.0",
+		"@types/assert": "1.5.10",
+		"@types/chai": "4.3.16",
+		"assert": "2.1.0",
 		"web-tree-sitter": "0.22.6",
-		"yargs": "^17.7.2"
+		"yargs": "17.7.2"
 	},
 	"name": "anycode-client",
 	"scripts": {}
