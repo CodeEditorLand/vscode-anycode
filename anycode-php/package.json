@@ -1,6 +1,24 @@
 {
+	"name": "anycode-php",
+	"publisher": "ms-vscode",
+	"displayName": "anycode-php",
+	"description": "PHP for Anycode",
+	"license": "MIT",
+	"version": "0.0.7",
+	"preview": true,
+	"repository": {
+		"url": "https://github.com/microsoft/vscode-anycode"
+	},
+	"engines": {
+		"vscode": "^1.67.0"
+	},
+	"categories": [
+		"Programming Languages"
+	],
 	"contributes": {
 		"anycodeLanguages": {
+			"grammarPath": "./tree-sitter-php.wasm",
+			"languageId": "php",
 			"extensions": [
 				"php",
 				"php4",
@@ -8,8 +26,6 @@
 				"phtml",
 				"ctp"
 			],
-			"grammarPath": "./tree-sitter-php.wasm",
-			"languageId": "php",
 			"queryPaths": {
 				"comments": "./queries/comments.scm",
 				"identifiers": "./queries/identifiers.scm",
@@ -22,15 +38,14 @@
 			]
 		}
 	},
-	"description": "PHP for Anycode",
-	"devDependencies": {
-		"tree-sitter-cli": "0.22.6",
-		"tree-sitter-php": "0.22.5"
-	},
-	"displayName": "anycode-php",
-	"name": "anycode-php",
-	"preview": true,
 	"scripts": {
-		"deploy": "npx vsce publish"
+		"postinstall": "npx tree-sitter build-wasm node_modules/tree-sitter-php",
+		"deploy": "npx vsce publish",
+		"test": "node ../anycode/server/src/common/test-fixture/test.js --highlights ./fixtures/highlights.php"
+	},
+	"devDependencies": {
+		"@playwright/test": "^1.14.1",
+		"tree-sitter-cli": "^0.20.8",
+		"tree-sitter-php": "^0.20.0"
 	}
 }
