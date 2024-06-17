@@ -1,17 +1,27 @@
 {
 	"name": "anycode-go",
+	"publisher": "ms-vscode",
 	"displayName": "anycode-go",
 	"description": "Go for Anycode",
-	"scripts": {
-		"deploy": "npx vsce publish"
+	"license": "MIT",
+	"version": "0.0.6",
+	"preview": true,
+	"repository": {
+		"url": "https://github.com/microsoft/vscode-anycode"
 	},
+	"engines": {
+		"vscode": "^1.67.0"
+	},
+	"categories": [
+		"Programming Languages"
+	],
 	"contributes": {
 		"anycodeLanguages": {
+			"grammarPath": "./tree-sitter-go.wasm",
+			"languageId": "go",
 			"extensions": [
 				"go"
 			],
-			"grammarPath": "./tree-sitter-go.wasm",
-			"languageId": "go",
 			"queryPaths": {
 				"comments": "./queries/comments.scm",
 				"identifiers": "./queries/identifiers.scm",
@@ -24,9 +34,14 @@
 			]
 		}
 	},
-	"devDependencies": {
-		"tree-sitter-cli": "^0.22.6",
-		"tree-sitter-go": "^0.21.0"
+	"scripts": {
+		"postinstall": "npx tree-sitter build-wasm node_modules/tree-sitter-go",
+		"deploy": "npx vsce publish",
+		"test": "node ../anycode/server/src/common/test-fixture/test.js  --outline ./fixtures/outline.go --highlights ./fixtures/highlights.go"
 	},
-	"preview": true
+	"devDependencies": {
+		"@playwright/test": "^1.14.1",
+		"tree-sitter-cli": "^0.20.8",
+		"tree-sitter-go": "^0.20.0"
+	}
 }
