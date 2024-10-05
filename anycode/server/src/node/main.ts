@@ -3,12 +3,13 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { createConnection } from 'vscode-languageserver/node';
-import { SymbolInfoStorage } from '../common/features/symbolIndex';
-import { IStorageFactory, startServer } from '../common/server';
-import { FileSymbolStorage } from './storage';
+import { createConnection } from "vscode-languageserver/node";
 
-process.on('unhandledRejection', (e: any) => {
+import { SymbolInfoStorage } from "../common/features/symbolIndex";
+import { IStorageFactory, startServer } from "../common/server";
+import { FileSymbolStorage } from "./storage";
+
+process.on("unhandledRejection", (e: any) => {
 	connection.console.error(`Unhandled exception`);
 	connection.console.error(e);
 });
@@ -23,7 +24,7 @@ const factory: IStorageFactory = {
 		if (obj instanceof FileSymbolStorage) {
 			obj.flush();
 		}
-	}
+	},
 };
 
 startServer(connection, factory);

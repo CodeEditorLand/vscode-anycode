@@ -3,9 +3,11 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-
 class Entry<E> {
-	constructor(readonly key: string, public value: E) { }
+	constructor(
+		readonly key: string,
+		public value: E,
+	) {}
 }
 
 export interface ReadonlyTrie<E> {
@@ -16,16 +18,18 @@ export interface ReadonlyTrie<E> {
 }
 
 export class Trie<E> implements ReadonlyTrie<E> {
-
 	static create<E>(): Trie<E> {
-		return new Trie('', undefined);
+		return new Trie("", undefined);
 	}
 
 	private _size: number = 0;
 	private _depth: number = 0;
 	private readonly _children = new Map<string, Trie<E>>();
 
-	private constructor(readonly ch: string, public element: Entry<E> | undefined) { }
+	private constructor(
+		readonly ch: string,
+		public element: Entry<E> | undefined,
+	) {}
 
 	get size() {
 		return this._size;
@@ -116,12 +120,16 @@ export class Trie<E> implements ReadonlyTrie<E> {
 	}
 
 	*query(str: string[]): IterableIterator<[string, E]> {
-
 		const bucket = new Set<Trie<E>>();
 		const cache = new Map<Trie<E>, Map<number, boolean>>();
 
-		const _query = (node: Trie<E>, str: string[], pos: number, skipped: number, lastCh: string) => {
-
+		const _query = (
+			node: Trie<E>,
+			str: string[],
+			pos: number,
+			skipped: number,
+			lastCh: string,
+		) => {
 			if (bucket.has(node)) {
 				return;
 			}

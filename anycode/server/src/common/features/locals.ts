@@ -3,33 +3,46 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import * as lsp from 'vscode-languageserver';
-import { asLspRange, compareRangeByStart, containsPosition, containsRange, symbolMapping } from '../common';
-import { Trees } from '../trees';
-import { QueryCapture } from 'web-tree-sitter';
-import Languages from '../languages';
-import { TextDocument } from 'vscode-languageserver-textdocument';
+import * as lsp from "vscode-languageserver";
+import { TextDocument } from "vscode-languageserver-textdocument";
+import { QueryCapture } from "web-tree-sitter";
+
+import {
+	asLspRange,
+	compareRangeByStart,
+	containsPosition,
+	containsRange,
+	symbolMapping,
+} from "../common";
+import Languages from "../languages";
+import { Trees } from "../trees";
 
 export class Locals {
-
 	static async create(document: TextDocument, trees: Trees): Promise<Locals> {
-		const root = new Scope(lsp.Range.create(0, 0, document.lineCount, 0), true);
+		const root = new Scope(
+			lsp.Range.create(0, 0, document.lineCount, 0),
+			true,
+		);
 		const tree = await trees.getParseTree(document);
 		if (!tree) {
 			return new Locals(document, root);
 		}
 
 		const all: Node[] = [];
-		const query = Languages.getQuery(tree.getLanguage(), 'locals');
-		const captures = query.captures(tree.rootNode).sort(this._compareCaptures);
+		const query = Languages.getQuery(tree.getLanguage(), "locals");
+		const captures = query
+			.captures(tree.rootNode)
+			.sort(this._compareCaptures);
 
 		// Find all scopes and merge some. The challange is that function-bodies "see" their
 		// arguments but function-block-nodes and argument-list-nodes are usually siblings
-		const scopeCaptures = captures.filter(capture => capture.name.startsWith('scope'));
+		const scopeCaptures = captures.filter((capture) =>
+			capture.name.startsWith("scope"),
+		);
 		for (let i = 0; i < scopeCaptures.length; i++) {
 			const capture = scopeCaptures[i];
 			const range = asLspRange(capture.node);
-			all.push(new Scope(range, capture.name.endsWith('.exports')));
+			all.push(new Scope(range, capture.name.endsWith(".exports")));
 		}
 
 		// Find all definitions and usages and mix them with scopes
@@ -43,20 +56,27 @@ export class Locals {
 		return info;
 	}
 
-	private static _fillInDefinitionsAndUsages(bucket: Node[], captures: QueryCapture[]): void {
+	private static _fillInDefinitionsAndUsages(
+		bucket: Node[],
+		captures: QueryCapture[],
+	): void {
 		for (const capture of captures) {
-			if (capture.name.startsWith('local')) {
-				bucket.push(new Definition(
-					capture.node.text,
-					asLspRange(capture.node),
-					capture.name.endsWith('.escape')
-				));
-			} else if (capture.name.startsWith('usage')) {
-				bucket.push(new Usage(
-					capture.node.text,
-					asLspRange(capture.node),
-					capture.name.endsWith('.void')
-				));
+			if (capture.name.startsWith("local")) {
+				bucket.push(
+					new Definition(
+						capture.node.text,
+						asLspRange(capture.node),
+						capture.name.endsWith(".escape"),
+					),
+				);
+			} else if (capture.name.startsWith("usage")) {
+				bucket.push(
+					new Usage(
+						capture.node.text,
+						asLspRange(capture.node),
+						capture.name.endsWith(".void"),
+					),
+				);
 			}
 		}
 	}
@@ -68,7 +88,6 @@ export class Locals {
 				let parent = stack.pop() ?? root;
 
 				if (containsRange(parent.range, thing.range)) {
-
 					if (thing instanceof Definition && thing.escapeToParent) {
 						(stack[stack.length - 1] ?? root).appendChild(thing);
 					} else {
@@ -99,7 +118,6 @@ export class Locals {
 		}
 	}
 
-
 	private static _compareCaptures(a: QueryCapture, b: QueryCapture) {
 		return a.node.startIndex - b.node.startIndex;
 	}
@@ -110,29 +128,28 @@ export class Locals {
 
 	private constructor(
 		readonly document: TextDocument,
-		readonly root: Scope
-	) { }
+		readonly root: Scope,
+	) {}
 
 	debugPrint() {
 		console.log(this.root.toString());
 	}
-
-
 }
 
 const enum NodeType {
-	'Scope', 'Definition', 'Usage'
+	"Scope",
+	"Definition",
+	"Usage",
 }
 
 abstract class Node {
-
 	protected _parent: Node | undefined;
 	protected _children: Node[] = [];
 
 	constructor(
 		readonly range: lsp.Range,
-		readonly type: NodeType
-	) { }
+		readonly type: NodeType,
+	) {}
 
 	children(): readonly Node[] {
 		return this._children;
@@ -158,7 +175,6 @@ abstract class Node {
 	toString() {
 		return `${this.type}@${this.range.start.line},${this.range.start.character}-${this.range.end.line},${this.range.end.character}`;
 	}
-
 }
 
 export class Usage extends Node {
@@ -187,7 +203,7 @@ export class Definition extends Node {
 	constructor(
 		readonly name: string,
 		readonly range: lsp.Range,
-		readonly escapeToParent: boolean
+		readonly escapeToParent: boolean,
 	) {
 		super(range, NodeType.Definition);
 	}
@@ -206,7 +222,6 @@ export class Definition extends Node {
 }
 
 export class Scope extends Node {
-
 	readonly likelyExports: boolean;
 
 	constructor(range: lsp.Range, likelyExports: boolean) {
@@ -245,11 +260,16 @@ export class Scope extends Node {
 		return this;
 	}
 
-	findDefinitionOrUsage(position: lsp.Position): Definition | Usage | undefined {
+	findDefinitionOrUsage(
+		position: lsp.Position,
+	): Definition | Usage | undefined {
 		let scope = this._findScope(position);
 		while (true) {
 			for (let child of scope._children) {
-				if ((child instanceof Definition || child instanceof Usage) && containsPosition(child.range, position)) {
+				if (
+					(child instanceof Definition || child instanceof Usage) &&
+					containsPosition(child.range, position)
+				) {
 					return child;
 				}
 			}
@@ -295,7 +315,6 @@ export class Scope extends Node {
 	}
 
 	private _findUsagesDown(text: string, bucket: Usage[][]): void {
-
 		// usages in this scope
 		const result: Usage[] = [];
 		for (let child of this.usages()) {
@@ -323,12 +342,10 @@ export class Scope extends Node {
 	}
 
 	toString(depth: number = 0): string {
-
-
 		let scopes: string[] = [];
 		let parts: string[] = [];
 
-		this._children.slice(0).forEach(child => {
+		this._children.slice(0).forEach((child) => {
 			if (child instanceof Scope) {
 				scopes.push(child.toString(depth + 2));
 			} else {
@@ -336,12 +353,11 @@ export class Scope extends Node {
 			}
 		});
 
-		let indent = ' '.repeat(depth);
+		let indent = " ".repeat(depth);
 		let res = `${indent}Scope@${this.range.start.line},${this.range.start.character}-${this.range.end.line},${this.range.end.character}`;
 		res += `\n${indent + indent}${parts.join(`, `)}`;
 		res += `\n${indent}${scopes.join(`\n${indent}`)}`;
 
 		return res;
-
 	}
 }

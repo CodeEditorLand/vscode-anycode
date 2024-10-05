@@ -5,8 +5,12 @@
 
 // ghetto LRU that utilizes the fact that Map keeps things in insertion order
 export class LRUMap<K, V> extends Map<K, V> {
-
-	constructor(private readonly _options: { size: number, dispose: (entries: [K, V][]) => void }) {
+	constructor(
+		private readonly _options: {
+			size: number;
+			dispose: (entries: [K, V][]) => void;
+		},
+	) {
 		super();
 	}
 
@@ -28,8 +32,7 @@ export class LRUMap<K, V> extends Map<K, V> {
 
 	private _checkSize(): void {
 		setTimeout(() => {
-
-			const slack = Math.ceil(this._options.size * .3);
+			const slack = Math.ceil(this._options.size * 0.3);
 
 			if (this.size < this._options.size + slack) {
 				return;
@@ -41,5 +44,4 @@ export class LRUMap<K, V> extends Map<K, V> {
 			this._options.dispose(result);
 		}, 0);
 	}
-
 }

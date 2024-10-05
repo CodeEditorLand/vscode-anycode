@@ -3,27 +3,40 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { CancellationTokenSource, Connection, Diagnostic, DiagnosticSeverity } from 'vscode-languageserver';
-import { TextDocument } from 'vscode-languageserver-textdocument';
-import { asLspRange, isInteresting } from '../common';
-import { DocumentStore } from '../documentStore';
-import { Trees } from '../trees';
+import {
+	CancellationTokenSource,
+	Connection,
+	Diagnostic,
+	DiagnosticSeverity,
+} from "vscode-languageserver";
+import { TextDocument } from "vscode-languageserver-textdocument";
+
+import { asLspRange, isInteresting } from "../common";
+import { DocumentStore } from "../documentStore";
+import { Trees } from "../trees";
 
 export class Validation {
-
-	private readonly _currentValidation = new Map<TextDocument, CancellationTokenSource>();
+	private readonly _currentValidation = new Map<
+		TextDocument,
+		CancellationTokenSource
+	>();
 
 	constructor(
 		private readonly _connection: Connection,
 		documents: DocumentStore,
-		private readonly _trees: Trees
+		private readonly _trees: Trees,
 	) {
 		documents.all().forEach(this._triggerValidation, this);
-		documents.onDidChangeContent(e => this._triggerValidation(e.document));
-		documents.onDidOpen(e => this._triggerValidation(e.document));
+		documents.onDidChangeContent((e) =>
+			this._triggerValidation(e.document),
+		);
+		documents.onDidOpen((e) => this._triggerValidation(e.document));
 
-		documents.onDidClose(e => {
-			_connection.sendDiagnostics({ uri: e.document.uri, diagnostics: [] });
+		documents.onDidClose((e) => {
+			_connection.sendDiagnostics({
+				uri: e.document.uri,
+				diagnostics: [],
+			});
 		});
 	}
 
@@ -33,7 +46,11 @@ export class Validation {
 			return;
 		}
 
-		const config: { diagnostics: boolean } = await this._connection.workspace.getConfiguration({ section: 'anycode', scopeUri: document.uri });
+		const config: { diagnostics: boolean } =
+			await this._connection.workspace.getConfiguration({
+				section: "anycode",
+				scopeUri: document.uri,
+			});
 		if (!config.diagnostics) {
 			return;
 		}
@@ -65,8 +82,8 @@ export class Validation {
 							range: asLspRange(cursor.currentNode()),
 							message: `Expected '${cursor.nodeType}'`,
 							severity: DiagnosticSeverity.Error,
-							source: 'anycode',
-							code: 'missing',
+							source: "anycode",
+							code: "missing",
 						});
 						seen.add(cursor.nodeId);
 					}

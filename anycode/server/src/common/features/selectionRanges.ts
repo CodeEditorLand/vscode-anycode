@@ -3,25 +3,34 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import type Parser from 'web-tree-sitter';
-import * as lsp from 'vscode-languageserver';
-import { asLspRange as asLspRange } from '../common';
-import { Trees } from '../trees';
-import { DocumentStore } from '../documentStore';
-import Languages from '../languages';
+import * as lsp from "vscode-languageserver";
+import type Parser from "web-tree-sitter";
+
+import { asLspRange } from "../common";
+import { DocumentStore } from "../documentStore";
+import Languages from "../languages";
+import { Trees } from "../trees";
 
 export class SelectionRangesProvider {
-
-	constructor(private _documents: DocumentStore, private _trees: Trees) { }
+	constructor(
+		private _documents: DocumentStore,
+		private _trees: Trees,
+	) {}
 
 	register(connection: lsp.Connection) {
-		connection.client.register(lsp.SelectionRangeRequest.type, { documentSelector: Languages.allAsSelector() });
-		connection.onRequest(lsp.SelectionRangeRequest.type, this.provideSelectionRanges.bind(this));
+		connection.client.register(lsp.SelectionRangeRequest.type, {
+			documentSelector: Languages.allAsSelector(),
+		});
+		connection.onRequest(
+			lsp.SelectionRangeRequest.type,
+			this.provideSelectionRanges.bind(this),
+		);
 	}
 
 	async provideSelectionRanges(params: lsp.SelectionRangeParams) {
-
-		const document = await this._documents.retrieve(params.textDocument.uri);
+		const document = await this._documents.retrieve(
+			params.textDocument.uri,
+		);
 		const tree = await this._trees.getParseTree(document);
 		if (!tree) {
 			return [];
@@ -37,8 +46,11 @@ export class SelectionRangesProvider {
 			stack.push(node);
 
 			while (true) {
-				let child = node.namedChildren.find(candidate => {
-					return candidate.startIndex <= offset && candidate.endIndex > offset;
+				let child = node.namedChildren.find((candidate) => {
+					return (
+						candidate.startIndex <= offset &&
+						candidate.endIndex > offset
+					);
 				});
 
 				if (child) {
@@ -61,5 +73,4 @@ export class SelectionRangesProvider {
 
 		return result;
 	}
-
 }
