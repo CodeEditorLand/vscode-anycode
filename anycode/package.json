@@ -10,7 +10,7 @@
 		"url": "https://github.com/microsoft/vscode-anycode"
 	},
 	"engines": {
-		"vscode": "^1.80.0"
+		"vscode": "1.80.0"
 	},
 	"categories": [
 		"Programming Languages"
@@ -115,13 +115,13 @@
 		"test-server": "cd server && npm run test"
 	},
 	"devDependencies": {
-		"@types/node": "^16.7.3",
-		"@typescript-eslint/eslint-plugin": "^4.14.1",
-		"@typescript-eslint/parser": "^4.14.1",
-		"@vscode/test-web": "^0.0.53",
-		"esbuild": "^0.15.12",
-		"eslint": "^7.19.0",
-		"typescript": "^4.5.2",
-		"@vscode/vsce": "^2.24.0"
+		"@types/node": "16.7.3",
+		"@typescript-eslint/eslint-plugin": "4.14.1",
+		"@typescript-eslint/parser": "4.14.1",
+		"@vscode/test-web": "0.0.53",
+		"esbuild": "0.15.12",
+		"eslint": "7.19.0",
+		"typescript": "4.5.2",
+		"@vscode/vsce": "2.24.0"
 	}
 }
