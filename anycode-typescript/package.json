@@ -1,11 +1,27 @@
 {
+	"name": "anycode-typescript",
+	"publisher": "ms-vscode",
+	"displayName": "anycode-typescript",
+	"description": "TypeScript for Anycode",
+	"license": "MIT",
+	"version": "0.0.6",
+	"preview": true,
+	"repository": {
+		"url": "https://github.com/microsoft/vscode-anycode"
+	},
+	"engines": {
+		"vscode": "^1.67.0"
+	},
+	"categories": [
+		"Programming Languages"
+	],
 	"contributes": {
 		"anycodeLanguages": {
+			"grammarPath": "./tree-sitter-typescript.wasm",
+			"languageId": "typescript",
 			"extensions": [
 				"ts"
 			],
-			"grammarPath": "./tree-sitter-typescript.wasm",
-			"languageId": "typescript",
 			"queryPaths": {
 				"comments": "./queries/comments.scm",
 				"identifiers": "./queries/identifiers.scm",
@@ -18,15 +34,14 @@
 			]
 		}
 	},
-	"description": "TypeScript for Anycode",
-	"devDependencies": {
-		"tree-sitter-cli": "0.24.2",
-		"tree-sitter-typescript": "0.23.0"
-	},
-	"displayName": "anycode-typescript",
-	"name": "anycode-typescript",
-	"preview": true,
 	"scripts": {
-		"deploy": "npx vsce publish"
+		"postinstall": "npx tree-sitter build-wasm node_modules/tree-sitter-typescript/typescript",
+		"deploy": "npx vsce publish",
+		"test": "node ../anycode/server/src/common/test-fixture/test.js  --outline ./fixtures/outline.ts --highlights ./fixtures/highlights.ts"
+	},
+	"devDependencies": {
+		"@playwright/test": "^1.14.1",
+		"tree-sitter-cli": "^0.20.8",
+		"tree-sitter-typescript": "^0.20.3"
 	}
 }

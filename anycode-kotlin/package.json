@@ -1,11 +1,38 @@
 {
+	"name": "anycode-kotlin",
+	"publisher": "ms-vscode",
+	"displayName": "anycode-kotlin",
+	"description": "Kotlin for Anycode",
+	"license": "MIT",
+	"version": "0.0.6",
+	"preview": true,
+	"repository": {
+		"url": "https://github.com/microsoft/vscode-anycode"
+	},
+	"engines": {
+		"vscode": "^1.67.0"
+	},
+	"categories": [
+		"Programming Languages"
+	],
 	"contributes": {
+		"languages": [
+			{
+				"id": "kotlin",
+				"extensions": [
+					"kt"
+				],
+				"aliases": [
+					"kotlin"
+				]
+			}
+		],
 		"anycodeLanguages": {
+			"grammarPath": "./tree-sitter-kotlin.wasm",
+			"languageId": "kotlin",
 			"extensions": [
 				"kt"
 			],
-			"grammarPath": "./tree-sitter-kotlin.wasm",
-			"languageId": "kotlin",
 			"queryPaths": {
 				"comments": "./queries/comments.scm",
 				"folding": "./queries/folding.scm",
@@ -14,28 +41,15 @@
 				"outline": "./queries/outline.scm",
 				"references": "./queries/references.scm"
 			}
-		},
-		"languages": [
-			{
-				"aliases": [
-					"kotlin"
-				],
-				"extensions": [
-					"kt"
-				],
-				"id": "kotlin"
-			}
-		]
+		}
 	},
-	"description": "Kotlin for Anycode",
-	"devDependencies": {
-		"@swimm/tree-sitter-kotlin": "0.3.2",
-		"tree-sitter-cli": "0.24.2"
-	},
-	"displayName": "anycode-kotlin",
-	"name": "anycode-kotlin",
-	"preview": true,
 	"scripts": {
-		"deploy": "npx vsce publish"
+		"postinstall": "npx tree-sitter build-wasm node_modules/@swimm/tree-sitter-kotlin",
+		"deploy": "npx vsce publish",
+		"test": "node ../anycode/server/src/common/test-fixture/test.js --outline ./fixtures/outline.kt"
+	},
+	"devDependencies": {
+		"tree-sitter-cli": "^0.20.8",
+		"@swimm/tree-sitter-kotlin": "^0.3.2"
 	}
 }

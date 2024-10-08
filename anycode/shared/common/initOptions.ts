@@ -3,6 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+
 export interface Queries {
 	readonly comments?: string;
 	readonly folding?: string;
@@ -18,17 +19,18 @@ export class LanguageInfo {
 		readonly languageId: string,
 		readonly suffixes: string[],
 		readonly suppressedBy: string[],
-		readonly queryInfo: Queries,
-	) {}
+		readonly queryInfo: Queries
+	) { }
 }
 
 export class Language {
+
 	private _data?: Promise<LanguageData>;
 
 	constructor(
 		readonly info: LanguageInfo,
-		private readonly _loadData: () => Promise<LanguageData>,
-	) {}
+		private readonly _loadData: () => Promise<LanguageData>
+	) { }
 
 	fetchLanguageData() {
 		this._data ??= this._loadData();
@@ -40,7 +42,7 @@ export class LanguageData {
 	constructor(
 		readonly grammarBase64: string,
 		readonly queries: Queries,
-	) {}
+	) { }
 }
 
 export interface FeatureConfig {
@@ -52,12 +54,12 @@ export interface FeatureConfig {
 	folding?: boolean;
 	workspaceSymbols?: boolean;
 	diagnostics?: boolean;
-}
+};
 
 export type LanguageConfiguration = [LanguageInfo, FeatureConfig][];
 
 export type InitOptions = {
 	treeSitterWasmUri: string;
-	supportedLanguages: LanguageConfiguration;
+	supportedLanguages: LanguageConfiguration,
 	databaseName: string;
 };
