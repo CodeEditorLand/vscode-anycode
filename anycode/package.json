@@ -76,8 +76,8 @@
 	},
 	"description": "",
 	"devDependencies": {
-		"@types/node": "^16.7.3",
-		"esbuild": "^0.15.12"
+		"@types/node": "^22.7.5",
+		"esbuild": "^0.24.0"
 	},
 	"displayName": "anycode",
 	"enabledApiProposals": [
