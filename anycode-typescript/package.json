@@ -1,4 +1,10 @@
 {
+	"name": "anycode-typescript",
+	"displayName": "anycode-typescript",
+	"description": "TypeScript for Anycode",
+	"scripts": {
+		"deploy": "npx vsce publish"
+	},
 	"contributes": {
 		"anycodeLanguages": {
 			"extensions": [
@@ -18,15 +24,9 @@
 			]
 		}
 	},
-	"description": "TypeScript for Anycode",
 	"devDependencies": {
 		"tree-sitter-cli": "0.24.2",
 		"tree-sitter-typescript": "0.23.0"
 	},
-	"displayName": "anycode-typescript",
-	"name": "anycode-typescript",
-	"preview": true,
-	"scripts": {
-		"deploy": "npx vsce publish"
-	}
+	"preview": true
 }

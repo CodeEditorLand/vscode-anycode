@@ -1,4 +1,10 @@
 {
+	"name": "anycode-c-sharp",
+	"displayName": "anycode-c-sharp",
+	"description": "C# for Anycode",
+	"scripts": {
+		"deploy": "npx vsce publish"
+	},
 	"contributes": {
 		"anycodeLanguages": {
 			"extensions": [
@@ -18,15 +24,9 @@
 			]
 		}
 	},
-	"description": "C# for Anycode",
 	"devDependencies": {
 		"tree-sitter-c-sharp": "0.23.0",
 		"tree-sitter-cli": "0.24.2"
 	},
-	"displayName": "anycode-c-sharp",
-	"name": "anycode-c-sharp",
-	"preview": true,
-	"scripts": {
-		"deploy": "npx vsce publish"
-	}
+	"preview": true
 }
