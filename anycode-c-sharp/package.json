@@ -20,8 +20,8 @@
 	},
 	"description": "C# for Anycode",
 	"devDependencies": {
-		"tree-sitter-c-sharp": "^0.23.0",
-		"tree-sitter-cli": "^0.24.2"
+		"tree-sitter-c-sharp": "0.23.0",
+		"tree-sitter-cli": "0.24.2"
 	},
 	"displayName": "anycode-c-sharp",
 	"name": "anycode-c-sharp",

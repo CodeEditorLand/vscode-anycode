@@ -51,9 +51,9 @@
 	},
 	"description": "C/C++ for Anycode",
 	"devDependencies": {
-		"tree-sitter-c": "^0.23.1",
-		"tree-sitter-cli": "^0.24.2",
-		"tree-sitter-cpp": "^0.23.1"
+		"tree-sitter-c": "0.23.1",
+		"tree-sitter-cli": "0.24.2",
+		"tree-sitter-cpp": "0.23.1"
 	},
 	"displayName": "anycode-cpp",
 	"name": "anycode-cpp",

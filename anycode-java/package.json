@@ -21,8 +21,8 @@
 	},
 	"description": "Java for Anycode",
 	"devDependencies": {
-		"tree-sitter-cli": "^0.24.2",
-		"tree-sitter-java": "^0.23.2"
+		"tree-sitter-cli": "0.24.2",
+		"tree-sitter-java": "0.23.2"
 	},
 	"displayName": "anycode-java",
 	"name": "anycode-java",

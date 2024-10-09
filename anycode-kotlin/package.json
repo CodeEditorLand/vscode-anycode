@@ -29,8 +29,8 @@
 	},
 	"description": "Kotlin for Anycode",
 	"devDependencies": {
-		"@swimm/tree-sitter-kotlin": "^0.3.2",
-		"tree-sitter-cli": "^0.24.2"
+		"@swimm/tree-sitter-kotlin": "0.3.2",
+		"tree-sitter-cli": "0.24.2"
 	},
 	"displayName": "anycode-kotlin",
 	"name": "anycode-kotlin",
