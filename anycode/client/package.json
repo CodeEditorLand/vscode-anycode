@@ -1,8 +1,8 @@
 {
-	"name": "anycode-client",
 	"dependencies": {},
 	"devDependencies": {
 		"@types/node": "22.7.5",
 		"assert": "2.1.0"
-	}
+	},
+	"name": "anycode-client"
 }

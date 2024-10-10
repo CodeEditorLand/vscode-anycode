@@ -1,6 +1,4 @@
 {
-	"name": "anycode-client",
-	"scripts": {},
 	"dependencies": {},
 	"devDependencies": {
 		"@types/assert": "1.5.10",
@@ -8,5 +6,7 @@
 		"assert": "2.1.0",
 		"web-tree-sitter": "0.24.2",
 		"yargs": "17.7.2"
-	}
+	},
+	"name": "anycode-client",
+	"scripts": {}
 }
