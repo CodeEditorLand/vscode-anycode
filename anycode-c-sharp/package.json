@@ -21,7 +21,7 @@
 	"description": "C# for Anycode",
 	"devDependencies": {
 		"tree-sitter-c-sharp": "0.23.0",
-		"tree-sitter-cli": "0.24.2"
+		"tree-sitter-cli": "0.24.3"
 	},
 	"displayName": "anycode-c-sharp",
 	"name": "anycode-c-sharp",

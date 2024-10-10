@@ -24,7 +24,7 @@
 	},
 	"description": "PHP for Anycode",
 	"devDependencies": {
-		"tree-sitter-cli": "0.24.2",
+		"tree-sitter-cli": "0.24.3",
 		"tree-sitter-php": "0.23.4"
 	},
 	"displayName": "anycode-php",
