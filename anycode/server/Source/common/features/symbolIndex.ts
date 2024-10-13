@@ -3,17 +3,17 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import * as lsp from 'vscode-languageserver';
-import { TextDocument } from 'vscode-languageserver-textdocument';
-import { isInteresting, parallel, StopWatch } from '../common';
-import { DocumentStore } from '../documentStore';
-import { Trees } from '../trees';
-import { Trie } from '../util/trie';
-import { getDocumentSymbols } from './documentSymbols';
-import { getDocumentUsages, IUsage } from './references';
+import * as lsp from "vscode-languageserver";
+import { TextDocument } from "vscode-languageserver-textdocument";
+
+import { isInteresting, parallel, StopWatch } from "../common";
+import { DocumentStore } from "../documentStore";
+import { Trees } from "../trees";
+import { Trie } from "../util/trie";
+import { getDocumentSymbols } from "./documentSymbols";
+import { getDocumentUsages, IUsage } from "./references";
 
 class Queue {
-
 	private readonly _queue = new Set<string>();
 
 	enqueue(uri: string): void {
@@ -51,7 +51,6 @@ export interface SymbolInfoStorage {
 }
 
 export class MemorySymbolStorage implements SymbolInfoStorage {
-
 	private readonly _map = new Map<string, Map<string, SymbolInfo>>();
 
 	insert(uri: string, info: Map<string, SymbolInfo>): void {
@@ -70,12 +69,11 @@ export class MemorySymbolStorage implements SymbolInfoStorage {
 }
 
 export interface SymbolInfo {
-	definitions: Set<lsp.SymbolKind>
-	usages: Set<lsp.SymbolKind>
+	definitions: Set<lsp.SymbolKind>;
+	usages: Set<lsp.SymbolKind>;
 }
 
 class Index {
-
 	private readonly _index = Trie.create<Map<lsp.DocumentUri, SymbolInfo>>();
 	private readonly _cleanup = new Map<lsp.DocumentUri, Function>();
 
@@ -83,16 +81,19 @@ class Index {
 		return this._index.get(text);
 	}
 
-	query(query: string): IterableIterator<[string, Map<lsp.DocumentUri, SymbolInfo>]> {
+	query(
+		query: string,
+	): IterableIterator<[string, Map<lsp.DocumentUri, SymbolInfo>]> {
 		return this._index.query(Array.from(query));
 	}
 
-	[Symbol.iterator](): IterableIterator<[string, Map<lsp.DocumentUri, SymbolInfo>]> {
+	[Symbol.iterator](): IterableIterator<
+		[string, Map<lsp.DocumentUri, SymbolInfo>]
+	> {
 		return this._index[Symbol.iterator]();
 	}
 
 	update(uri: lsp.DocumentUri, value: Map<string, SymbolInfo>) {
-
 		// (1) remove old symbol information
 		this._cleanup.get(uri)?.();
 
@@ -131,7 +132,6 @@ class Index {
 }
 
 class SuffixFilter {
-
 	private _suffixes = new Set<string>();
 	private _regex?: RegExp;
 
@@ -143,16 +143,18 @@ class SuffixFilter {
 		for (const item of suffixes) {
 			this._suffixes.add(item);
 		}
-		this._regex = new RegExp(`\\.(${Array.from(this._suffixes).map(SuffixFilter._escapeRegExpCharacters).join('|')})`, 'i');
+		this._regex = new RegExp(
+			`\\.(${Array.from(this._suffixes).map(SuffixFilter._escapeRegExpCharacters).join("|")})`,
+			"i",
+		);
 	}
 
 	private static _escapeRegExpCharacters(value: string): string {
-		return value.replace(/[\\\{\}\*\+\?\|\^\$\.\[\]\(\)]/g, '\\$&');
+		return value.replace(/[\\\{\}\*\+\?\|\^\$\.\[\]\(\)]/g, "\\$&");
 	}
 }
 
 export class SymbolIndex {
-
 	readonly index = new Index();
 
 	private readonly _syncQueue = new Queue();
@@ -162,8 +164,8 @@ export class SymbolIndex {
 	constructor(
 		private readonly _trees: Trees,
 		private readonly _documents: DocumentStore,
-		private readonly _symbolInfoStorage: SymbolInfoStorage
-	) { }
+		private readonly _symbolInfoStorage: SymbolInfoStorage,
+	) {}
 
 	addFile(uri: string): void {
 		this._syncQueue.enqueue(uri);
@@ -180,18 +182,23 @@ export class SymbolIndex {
 
 	async update(): Promise<void> {
 		await this._currentUpdate;
-		const uris = this._syncQueue.consume(undefined, uri => this._suffixFilter.accept(uri));
+		const uris = this._syncQueue.consume(undefined, (uri) =>
+			this._suffixFilter.accept(uri),
+		);
 		this._currentUpdate = this._doUpdate(uris, false);
 		return this._currentUpdate;
 	}
 
 	private async _doUpdate(uris: string[], async: boolean): Promise<void> {
 		if (uris.length !== 0) {
-
 			// schedule a new task to update the cache for changed uris
 			const sw = new StopWatch();
 			const tasks = uris.map(this._createIndexTask, this);
-			const stats = await parallel(tasks, 50, new lsp.CancellationTokenSource().token);
+			const stats = await parallel(
+				tasks,
+				50,
+				new lsp.CancellationTokenSource().token,
+			);
 
 			let totalRetrieve = 0;
 			let totalIndex = 0;
@@ -200,11 +207,15 @@ export class SymbolIndex {
 				totalIndex += stat.durationIndex;
 			}
 
-			console.log(`[index] (${async ? 'async' : 'sync'}) added ${uris.length} files ${sw.elapsed()}ms (retrieval: ${Math.round(totalRetrieve)}ms, indexing: ${Math.round(totalIndex)}ms) (files: ${uris.map(String)})`);
+			console.log(
+				`[index] (${async ? "async" : "sync"}) added ${uris.length} files ${sw.elapsed()}ms (retrieval: ${Math.round(totalRetrieve)}ms, indexing: ${Math.round(totalIndex)}ms) (files: ${uris.map(String)})`,
+			);
 		}
 	}
 
-	private _createIndexTask(uri: string): () => Promise<{ durationRetrieve: number, durationIndex: number }> {
+	private _createIndexTask(
+		uri: string,
+	): () => Promise<{ durationRetrieve: number; durationIndex: number }> {
 		return async () => {
 			// fetch document
 			const _t1Retrieve = performance.now();
@@ -227,8 +238,11 @@ export class SymbolIndex {
 		};
 	}
 
-	private async _doIndex(document: TextDocument, symbols?: lsp.DocumentSymbol[], usages?: IUsage[]): Promise<void> {
-
+	private async _doIndex(
+		document: TextDocument,
+		symbols?: lsp.DocumentSymbol[],
+		usages?: IUsage[],
+	): Promise<void> {
 		const symbolInfo = new Map<string, SymbolInfo>();
 
 		// definitions
@@ -240,7 +254,10 @@ export class SymbolIndex {
 			if (all) {
 				all.definitions.add(symbol.kind);
 			} else {
-				symbolInfo.set(symbol.name, { definitions: new Set([symbol.kind]), usages: new Set() });
+				symbolInfo.set(symbol.name, {
+					definitions: new Set([symbol.kind]),
+					usages: new Set(),
+				});
 			}
 		}
 
@@ -253,7 +270,10 @@ export class SymbolIndex {
 			if (all) {
 				all.usages.add(usage.kind);
 			} else {
-				symbolInfo.set(usage.name, { definitions: new Set(), usages: new Set([usage.kind]) });
+				symbolInfo.set(usage.name, {
+					definitions: new Set(),
+					usages: new Set([usage.kind]),
+				});
 			}
 		}
 
@@ -274,7 +294,6 @@ export class SymbolIndex {
 			if (!uris.delete(uri)) {
 				// this file isn't requested anymore -> remove later
 				obsolete.add(uri);
-
 			} else {
 				// restore definitions and usages and schedule async
 				// update for this file
@@ -288,21 +307,24 @@ export class SymbolIndex {
 			this.addFile(uri);
 		}
 
-		// remove from persisted cache files that aren't interesting anymore 
+		// remove from persisted cache files that aren't interesting anymore
 		await this._symbolInfoStorage.delete(obsolete);
 
-		console.log(`[index] added FROM CACHE ${persisted.size} files ${sw.elapsed()}ms, all need revalidation, ${uris.size} files are NEW, ${obsolete.size} where OBSOLETE`);
+		console.log(
+			`[index] added FROM CACHE ${persisted.size} files ${sw.elapsed()}ms, all need revalidation, ${uris.size} files are NEW, ${obsolete.size} where OBSOLETE`,
+		);
 	}
 
 	async unleashFiles(suffixes: string[]) {
-
 		this._suffixFilter.update(suffixes);
 
 		await this.update();
 
 		// async update all files that were taken from cache
 		const asyncUpdate = async () => {
-			const uris = this._asyncQueue.consume(70, uri => this._suffixFilter.accept(uri));
+			const uris = this._asyncQueue.consume(70, (uri) =>
+				this._suffixFilter.accept(uri),
+			);
 			if (uris.length === 0) {
 				return;
 			}
@@ -316,7 +338,6 @@ export class SymbolIndex {
 	// ---
 
 	async getDefinitions(ident: string, source: TextDocument) {
-
 		await this.update();
 
 		const result: lsp.SymbolInformation[] = [];
@@ -326,47 +347,59 @@ export class SymbolIndex {
 		const work: Promise<any>[] = [];
 
 		for (const [uri, value] of all) {
-
 			if (value.definitions.size === 0) {
 				// only usages
 				continue;
 			}
 
-			work.push(this._documents.retrieve(uri).then(async document => {
-				const isSameLanguage = source.languageId === document.languageId;
-				const symbols = await getDocumentSymbols(document, this._trees, true);
-				for (const item of symbols) {
-					if (item.name === ident) {
-						const info = lsp.SymbolInformation.create(item.name, item.kind, item.selectionRange, uri);
-						if (isSameLanguage) {
-							result.unshift(info);
-							sameLanguageOffset++;
-						} else {
-							result.push(info);
+			work.push(
+				this._documents
+					.retrieve(uri)
+					.then(async (document) => {
+						const isSameLanguage =
+							source.languageId === document.languageId;
+						const symbols = await getDocumentSymbols(
+							document,
+							this._trees,
+							true,
+						);
+						for (const item of symbols) {
+							if (item.name === ident) {
+								const info = lsp.SymbolInformation.create(
+									item.name,
+									item.kind,
+									item.selectionRange,
+									uri,
+								);
+								if (isSameLanguage) {
+									result.unshift(info);
+									sameLanguageOffset++;
+								} else {
+									result.push(info);
+								}
+							}
 						}
-					}
-				}
 
-				// update index
-				setTimeout(() => {
-					this._asyncQueue.dequeue(document.uri);
-					this._doIndex(document, symbols);
-				});
-
-			}).catch(err => {
-				console.log(err);
-			}));
+						// update index
+						setTimeout(() => {
+							this._asyncQueue.dequeue(document.uri);
+							this._doIndex(document, symbols);
+						});
+					})
+					.catch((err) => {
+						console.log(err);
+					}),
+			);
 		}
 
 		await Promise.allSettled(work);
 
-		// only return results that are of the same language unless there are only 
+		// only return results that are of the same language unless there are only
 		// results from other languages
 		return result.slice(0, sameLanguageOffset || undefined);
 	}
 
 	async getUsages(ident: string, source: TextDocument) {
-
 		await this.update();
 
 		const result: lsp.Location[] = [];
@@ -376,41 +409,51 @@ export class SymbolIndex {
 		let sameLanguageOffset = 0;
 
 		for (const [uri, value] of all) {
-
 			if (value.usages.size === 0) {
 				// only definitions
 				continue;
 			}
 
-			work.push(this._documents.retrieve(uri).then(async document => {
-				const isSameLanguage = source.languageId === document.languageId;
-				const usages = await getDocumentUsages(document, this._trees);
-				for (const item of usages) {
-					if (item.name === ident) {
-						const location = lsp.Location.create(uri, item.range);
-						if (isSameLanguage) {
-							result.unshift(location);
-							sameLanguageOffset++;
-						} else {
-							result.push(location);
+			work.push(
+				this._documents
+					.retrieve(uri)
+					.then(async (document) => {
+						const isSameLanguage =
+							source.languageId === document.languageId;
+						const usages = await getDocumentUsages(
+							document,
+							this._trees,
+						);
+						for (const item of usages) {
+							if (item.name === ident) {
+								const location = lsp.Location.create(
+									uri,
+									item.range,
+								);
+								if (isSameLanguage) {
+									result.unshift(location);
+									sameLanguageOffset++;
+								} else {
+									result.push(location);
+								}
+							}
 						}
-					}
-				}
 
-				// update index
-				setTimeout(() => {
-					this._asyncQueue.dequeue(document.uri);
-					this._doIndex(document, undefined, usages);
-				});
-
-			}).catch(err => {
-				console.log(err);
-			}));
+						// update index
+						setTimeout(() => {
+							this._asyncQueue.dequeue(document.uri);
+							this._doIndex(document, undefined, usages);
+						});
+					})
+					.catch((err) => {
+						console.log(err);
+					}),
+			);
 		}
 
 		await Promise.allSettled(work);
 
-		// only return results that are of the same language unless there are only 
+		// only return results that are of the same language unless there are only
 		// results from other languages
 		return result.slice(0, sameLanguageOffset || undefined);
 	}

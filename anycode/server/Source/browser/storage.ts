@@ -4,18 +4,17 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { SymbolKind } from "vscode-languageserver";
-import { SymbolInfoStorage, SymbolInfo } from "../common/features/symbolIndex";
+
+import { SymbolInfo, SymbolInfoStorage } from "../common/features/symbolIndex";
 
 export class IndexedDBSymbolStorage implements SymbolInfoStorage {
-
 	private readonly _version = 1;
-	private readonly _store = 'fileSymbols';
+	private readonly _store = "fileSymbols";
 	private _db?: IDBDatabase;
 
-	constructor(private readonly _name: string) { }
+	constructor(private readonly _name: string) {}
 
 	async open() {
-
 		if (this._db) {
 			return;
 		}
@@ -26,7 +25,9 @@ export class IndexedDBSymbolStorage implements SymbolInfoStorage {
 			request.onsuccess = () => {
 				const db = request.result;
 				if (!db.objectStoreNames.contains(this._store)) {
-					console.error(`Error while opening IndexedDB. Could not find '${this._store}' object store`);
+					console.error(
+						`Error while opening IndexedDB. Could not find '${this._store}' object store`,
+					);
 					return resolve(this._delete(db).then(() => this.open()));
 				} else {
 					resolve(undefined);
@@ -66,7 +67,6 @@ export class IndexedDBSymbolStorage implements SymbolInfoStorage {
 	private _insertHandle: number | undefined | any;
 
 	insert(uri: string, info: Map<string, SymbolInfo>) {
-
 		const flatInfo: Array<string | number> = [];
 		for (let [word, i] of info) {
 			flatInfo.push(word);
@@ -78,7 +78,7 @@ export class IndexedDBSymbolStorage implements SymbolInfoStorage {
 		this._insertQueue.set(uri, flatInfo);
 		clearTimeout(this._insertHandle);
 		this._insertHandle = setTimeout(() => {
-			this._bulkInsert().catch(err => {
+			this._bulkInsert().catch((err) => {
 				console.error(err);
 			});
 		}, 50);
@@ -90,9 +90,9 @@ export class IndexedDBSymbolStorage implements SymbolInfoStorage {
 		}
 		return new Promise((resolve, reject) => {
 			if (!this._db) {
-				return reject(new Error('invalid state'));
+				return reject(new Error("invalid state"));
 			}
-			const t = this._db.transaction(this._store, 'readwrite');
+			const t = this._db.transaction(this._store, "readwrite");
 			const toInsert = new Map(this._insertQueue);
 			this._insertQueue.clear();
 			for (let [uri, data] of toInsert) {
@@ -104,13 +104,12 @@ export class IndexedDBSymbolStorage implements SymbolInfoStorage {
 	}
 
 	getAll(): Promise<Map<string, Map<string, SymbolInfo>>> {
-
 		return new Promise((resolve, reject) => {
 			if (!this._db) {
-				return reject(new Error('invalid state'));
+				return reject(new Error("invalid state"));
 			}
 			const entries = new Map<string, Map<string, SymbolInfo>>();
-			const t = this._db.transaction(this._store, 'readonly');
+			const t = this._db.transaction(this._store, "readonly");
 			const store = t.objectStore(this._store);
 			const cursor = store.openCursor();
 			cursor.onsuccess = () => {
@@ -119,17 +118,27 @@ export class IndexedDBSymbolStorage implements SymbolInfoStorage {
 					return;
 				}
 				const info = new Map<string, SymbolInfo>();
-				const flatInfo = (<Array<string | number>>cursor.result.value);
-				for (let i = 0; i < flatInfo.length;) {
-					let word = (<string>flatInfo[i]);
-					let defLen = (<number>flatInfo[++i]);
+				const flatInfo = <Array<string | number>>cursor.result.value;
+				for (let i = 0; i < flatInfo.length; ) {
+					let word = <string>flatInfo[i];
+					let defLen = <number>flatInfo[++i];
 					let kindStart = ++i;
 
-					for (; i < flatInfo.length && typeof flatInfo[i] === 'number'; i++) { ; }
+					for (
+						;
+						i < flatInfo.length && typeof flatInfo[i] === "number";
+						i++
+					) {}
 
 					info.set(word, {
-						definitions: new Set(<SymbolKind[]>flatInfo.slice(kindStart, kindStart + defLen)),
-						usages: new Set(<SymbolKind[]>flatInfo.slice(kindStart + defLen, i))
+						definitions: new Set(
+							<SymbolKind[]>(
+								flatInfo.slice(kindStart, kindStart + defLen)
+							),
+						),
+						usages: new Set(
+							<SymbolKind[]>flatInfo.slice(kindStart + defLen, i),
+						),
 					});
 				}
 
@@ -145,14 +154,14 @@ export class IndexedDBSymbolStorage implements SymbolInfoStorage {
 	delete(uris: Set<string>): Promise<void> {
 		return new Promise((resolve, reject) => {
 			if (!this._db) {
-				return reject(new Error('invalid state'));
+				return reject(new Error("invalid state"));
 			}
-			const t = this._db.transaction(this._store, 'readwrite');
+			const t = this._db.transaction(this._store, "readwrite");
 			const store = t.objectStore(this._store);
 
 			for (const uri of uris) {
 				const request = store.delete(uri);
-				request.onerror = e => console.error(e);
+				request.onerror = (e) => console.error(e);
 			}
 			t.oncomplete = () => resolve(undefined);
 			t.onerror = (err) => reject(err);

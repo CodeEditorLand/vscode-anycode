@@ -3,44 +3,45 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { LRUMap } from "./util/lruMap";
-import Parser, { Language } from 'web-tree-sitter';
-import { Disposable, Position } from 'vscode-languageserver';
-import { TextDocument } from 'vscode-languageserver-textdocument';
-import { DocumentStore, TextDocumentChange2 } from './documentStore';
+import { Disposable, Position } from "vscode-languageserver";
+import { TextDocument } from "vscode-languageserver-textdocument";
+import Parser, { Language } from "web-tree-sitter";
+
+import { DocumentStore, TextDocumentChange2 } from "./documentStore";
 import Languages from "./languages";
+import { LRUMap } from "./util/lruMap";
 
 class Entry {
 	constructor(
 		public version: number,
 		public tree: Parser.Tree,
-		public edits: Parser.Edit[][]
-	) { }
+		public edits: Parser.Edit[][],
+	) {}
 }
 
 export class Trees {
-
 	private readonly _cache = new LRUMap<string, Entry>({
 		size: 100,
 		dispose(entries) {
 			for (let [, value] of entries) {
 				value.tree.delete();
 			}
-		}
+		},
 	});
 
 	private readonly _listener: Disposable[] = [];
 	private readonly _parser = new Parser();
 
 	constructor(private readonly _documents: DocumentStore) {
-
 		// build edits when document changes
-		this._listener.push(_documents.onDidChangeContent2(e => {
-			const info = this._cache.get(e.document.uri);
-			if (info) {
-				info.edits.push(Trees._asEdits(e));
-			}
-		}));
+		this._listener.push(
+			_documents.onDidChangeContent2((e) => {
+				const info = this._cache.get(e.document.uri);
+				if (info) {
+					info.edits.push(Trees._asEdits(e));
+				}
+			}),
+		);
 	}
 
 	dispose(): void {
@@ -55,8 +56,10 @@ export class Trees {
 
 	// --- tree/parse
 
-	async getParseTree(documentOrUri: TextDocument | string): Promise<Parser.Tree | undefined> {
-		if (typeof documentOrUri === 'string') {
+	async getParseTree(
+		documentOrUri: TextDocument | string,
+	): Promise<Parser.Tree | undefined> {
+		if (typeof documentOrUri === "string") {
 			documentOrUri = await this._documents.retrieve(documentOrUri);
 		}
 		const language = await Languages.getLanguage(documentOrUri.languageId);
@@ -66,8 +69,10 @@ export class Trees {
 		return this._parse(documentOrUri, language);
 	}
 
-	private _parse(documentOrUri: TextDocument, language: Language): Parser.Tree | undefined {
-
+	private _parse(
+		documentOrUri: TextDocument,
+		language: Language,
+	): Parser.Tree | undefined {
 		let info = this._cache.get(documentOrUri.uri);
 		if (info?.version === documentOrUri.version) {
 			return info.tree;
@@ -85,12 +90,11 @@ export class Trees {
 				const tree = this._parser.parse(text);
 				info = new Entry(version, tree, []);
 				this._cache.set(documentOrUri.uri, info);
-
 			} else {
 				// existing entry, apply deltas and parse incremental
 				const oldTree = info.tree;
 				const deltas = info.edits.flat();
-				deltas.forEach(delta => oldTree.edit(delta));
+				deltas.forEach((delta) => oldTree.edit(delta));
 				info.edits.length = 0;
 
 				info.tree = this._parser.parse(text, oldTree);
@@ -99,7 +103,6 @@ export class Trees {
 			}
 
 			return info.tree;
-
 		} catch (e) {
 			this._cache.delete(documentOrUri.uri);
 			return undefined;
@@ -107,13 +110,17 @@ export class Trees {
 	}
 
 	private static _asEdits(event: TextDocumentChange2): Parser.Edit[] {
-		return event.changes.map(change => ({
+		return event.changes.map((change) => ({
 			startPosition: this._asTsPoint(change.range.start),
 			oldEndPosition: this._asTsPoint(change.range.end),
-			newEndPosition: this._asTsPoint(event.document.positionAt(change.rangeOffset + change.text.length)),
+			newEndPosition: this._asTsPoint(
+				event.document.positionAt(
+					change.rangeOffset + change.text.length,
+				),
+			),
 			startIndex: change.rangeOffset,
 			oldEndIndex: change.rangeOffset + change.rangeLength,
-			newEndIndex: change.rangeOffset + change.text.length
+			newEndIndex: change.rangeOffset + change.text.length,
 		}));
 	}
 
@@ -121,4 +128,4 @@ export class Trees {
 		const { line: row, character: column } = position;
 		return { row, column };
 	}
-};
+}
