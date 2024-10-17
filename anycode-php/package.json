@@ -1,10 +1,4 @@
 {
-	"name": "anycode-php",
-	"displayName": "anycode-php",
-	"description": "PHP for Anycode",
-	"scripts": {
-		"deploy": "npx vsce publish"
-	},
 	"contributes": {
 		"anycodeLanguages": {
 			"extensions": [
@@ -28,9 +22,15 @@
 			]
 		}
 	},
+	"description": "PHP for Anycode",
 	"devDependencies": {
 		"tree-sitter-cli": "0.24.3",
 		"tree-sitter-php": "0.23.4"
 	},
-	"preview": true
+	"displayName": "anycode-php",
+	"name": "anycode-php",
+	"preview": true,
+	"scripts": {
+		"deploy": "npx vsce publish"
+	}
 }
