@@ -1,7 +1,7 @@
 {
 	"dependencies": {},
 	"devDependencies": {
-		"@types/assert": "1.5.10",
+		"@types/assert": "1.5.11",
 		"@types/chai": "5.0.0",
 		"assert": "2.1.0",
 		"web-tree-sitter": "0.24.3",
