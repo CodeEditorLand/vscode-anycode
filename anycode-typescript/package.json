@@ -20,8 +20,8 @@
 	},
 	"description": "TypeScript for Anycode",
 	"devDependencies": {
-		"tree-sitter-cli": "0.24.3",
-		"tree-sitter-typescript": "0.23.0"
+		"tree-sitter-cli": "0.24.4",
+		"tree-sitter-typescript": "0.23.2"
 	},
 	"displayName": "anycode-typescript",
 	"name": "anycode-typescript",

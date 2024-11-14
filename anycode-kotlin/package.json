@@ -30,7 +30,7 @@
 	"description": "Kotlin for Anycode",
 	"devDependencies": {
 		"@swimm/tree-sitter-kotlin": "0.3.2",
-		"tree-sitter-cli": "0.24.3"
+		"tree-sitter-cli": "0.24.4"
 	},
 	"displayName": "anycode-kotlin",
 	"name": "anycode-kotlin",

@@ -20,8 +20,8 @@
 	},
 	"description": "Go for Anycode",
 	"devDependencies": {
-		"tree-sitter-cli": "0.24.3",
-		"tree-sitter-go": "0.23.1"
+		"tree-sitter-cli": "0.24.4",
+		"tree-sitter-go": "0.23.3"
 	},
 	"displayName": "anycode-go",
 	"name": "anycode-go",
