@@ -1,4 +1,10 @@
 {
+	"name": "anycode-cpp",
+	"displayName": "anycode-cpp",
+	"description": "C/C++ for Anycode",
+	"scripts": {
+		"deploy": "npx vsce publish"
+	},
 	"contributes": {
 		"anycodeLanguages": [
 			{
@@ -49,16 +55,10 @@
 			}
 		]
 	},
-	"description": "C/C++ for Anycode",
 	"devDependencies": {
 		"tree-sitter-c": "0.23.2",
 		"tree-sitter-cli": "0.24.4",
 		"tree-sitter-cpp": "0.23.4"
 	},
-	"displayName": "anycode-cpp",
-	"name": "anycode-cpp",
-	"preview": true,
-	"scripts": {
-		"deploy": "npx vsce publish"
-	}
+	"preview": true
 }
