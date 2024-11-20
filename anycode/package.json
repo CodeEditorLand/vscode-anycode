@@ -76,7 +76,7 @@
 	},
 	"description": "",
 	"devDependencies": {
-		"@types/node": "22.9.0",
+		"@types/node": "22.9.1",
 		"esbuild": "0.24.0"
 	},
 	"displayName": "anycode",
