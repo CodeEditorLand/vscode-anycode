@@ -55,10 +55,13 @@ export class FixtureMarks {
 export class Fixture {
 	static async parse(uri: string, languageId: string) {
 		const res = await fetch(uri);
+
 		const text = await res.text();
 
 		const r = /.+###.*/gu;
+
 		const names = text.match(r);
+
 		const documents = text
 			.split(r)
 			.filter(Boolean)
@@ -67,12 +70,14 @@ export class Fixture {
 			);
 
 		const store = new TestDocumentStore(...documents);
+
 		const trees = new Trees(store);
 
 		const fixtures: Fixture[] = [];
 
 		for (const doc of documents) {
 			const tree = await trees.getParseTree(doc);
+
 			if (!tree) {
 				throw new Error();
 			}
@@ -87,15 +92,18 @@ export class Fixture {
 					?.shift()
 					?.replace(/^.+###/, "")
 					.trim() ?? doc.uri;
+
 			if (name.includes("/SKIP/")) {
 				continue;
 			}
 
 			const marks: FixtureMarks[] = [];
+
 			const captures = query.captures(tree.rootNode);
 
 			for (const capture of captures) {
 				const start = capture.node.text.indexOf("^");
+
 				if (start < 0) {
 					continue;
 				}
@@ -111,11 +119,13 @@ export class Fixture {
 						{ row, column: start },
 						{ row, column: end },
 					);
+
 					if (query.captures(node).length > 0) {
 						// skip stacked comments
 						continue;
 					}
 					marks.push(new FixtureMarks(node.startIndex, node.text));
+
 					break;
 				}
 			}
@@ -124,6 +134,7 @@ export class Fixture {
 		}
 
 		trees.dispose();
+
 		return fixtures;
 	}
 

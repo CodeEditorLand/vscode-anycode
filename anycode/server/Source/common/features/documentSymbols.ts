@@ -22,6 +22,7 @@ export class DocumentSymbols {
 
 	async provideDocumentSymbols(params: lsp.DocumentSymbolParams): Promise<lsp.DocumentSymbol[]> {
 		const document = await this._documents.retrieve(params.textDocument.uri);
+
 		return getDocumentSymbols(document, this._trees, false);
 	}
 }
@@ -31,36 +32,45 @@ export async function getDocumentSymbols(document: TextDocument, trees: Trees, f
 	class Node {
 		readonly range: lsp.Range;
 		readonly children: Node[] = [];
+
 		constructor(readonly capture: QueryCapture) {
 			this.range = asLspRange(capture.node);
 		}
 	}
 
 	const tree = await trees.getParseTree(document);
+
 	if (!tree) {
 		return [];
 	}
 	const query = Languages.getQuery(tree.getLanguage(), 'outline');
+
 	const captures = query.captures(tree.rootNode);
 
 
 	// build a Node-tree that is based on range containment. This includes true 
 	// children as well as the "name-child"
 	const roots: Node[] = [];
+
 	const stack: Node[] = [];
+
 	for (const capture of captures) {
 		const node = new Node(capture);
+
 		let parent = stack.pop();
+
 		while (true) {
 			if (!parent) {
 				roots.push(node);
 				stack.push(node);
+
 				break;
 			}
 			if (containsRange(parent.range, node.range)) {
 				parent.children.push(node);
 				stack.push(parent);
 				stack.push(node);
+
 				break;
 			}
 			parent = stack.pop();
@@ -72,7 +82,9 @@ export async function getDocumentSymbols(document: TextDocument, trees: Trees, f
 	// a dedicated document symbol
 	function build(node: Node, bucket: lsp.DocumentSymbol[]): void {
 		let children: lsp.DocumentSymbol[] = [];
+
 		let nameNode: Node | undefined;
+
 		for (let child of node.children) {
 			if (!nameNode && child.capture.name.endsWith('.name') && child.capture.name.startsWith(node.capture.name)) {
 				nameNode = child;
@@ -91,6 +103,7 @@ export async function getDocumentSymbols(document: TextDocument, trees: Trees, f
 
 
 	const result: lsp.DocumentSymbol[] = [];
+
 	for (let node of roots) {
 		build(node, result);
 	}
@@ -103,10 +116,12 @@ export async function getDocumentSymbols(document: TextDocument, trees: Trees, f
 	(function flatten(all: lsp.DocumentSymbol[]) {
 		for (let item of all) {
 			flatResult.push(item);
+
 			if (item.children) {
 				flatten(item.children);
 			}
 		}
 	})(result);
+
 	return flatResult;
 }

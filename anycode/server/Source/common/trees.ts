@@ -37,6 +37,7 @@ export class Trees {
 		this._listener.push(
 			_documents.onDidChangeContent2((e) => {
 				const info = this._cache.get(e.document.uri);
+
 				if (info) {
 					info.edits.push(Trees._asEdits(e));
 				}
@@ -46,6 +47,7 @@ export class Trees {
 
 	dispose(): void {
 		this._parser.delete();
+
 		for (let item of this._cache.values()) {
 			item.tree.delete();
 		}
@@ -63,6 +65,7 @@ export class Trees {
 			documentOrUri = await this._documents.retrieve(documentOrUri);
 		}
 		const language = await Languages.getLanguage(documentOrUri.languageId);
+
 		if (!language) {
 			return undefined;
 		}
@@ -74,6 +77,7 @@ export class Trees {
 		language: Language,
 	): Parser.Tree | undefined {
 		let info = this._cache.get(documentOrUri.uri);
+
 		if (info?.version === documentOrUri.version) {
 			return info.tree;
 		}
@@ -83,6 +87,7 @@ export class Trees {
 
 		try {
 			const version = documentOrUri.version;
+
 			const text = documentOrUri.getText();
 
 			if (!info) {
@@ -93,6 +98,7 @@ export class Trees {
 			} else {
 				// existing entry, apply deltas and parse incremental
 				const oldTree = info.tree;
+
 				const deltas = info.edits.flat();
 				deltas.forEach((delta) => oldTree.edit(delta));
 				info.edits.length = 0;
@@ -105,6 +111,7 @@ export class Trees {
 			return info.tree;
 		} catch (e) {
 			this._cache.delete(documentOrUri.uri);
+
 			return undefined;
 		}
 	}
@@ -126,6 +133,7 @@ export class Trees {
 
 	private static _asTsPoint(position: Position): Parser.Point {
 		const { line: row, character: column } = position;
+
 		return { row, column };
 	}
 }

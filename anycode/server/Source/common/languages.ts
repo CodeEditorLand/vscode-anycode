@@ -47,16 +47,19 @@ export default abstract class Languages {
 
 	static init(langConfiguration: LanguageConfiguration): void {
 		this._langConfiguration = langConfiguration;
+
 		for (const [entry, config] of langConfiguration) {
 			this._configurations.set(entry.languageId, config);
 
 			let resolve: (
 				p: Promise<Parser.Language | undefined>,
 			) => void = () => {};
+
 			let promise = new Promise<Parser.Language | undefined>(
 				(_resolve) => {
 					resolve = async (p) => {
 						let language: Language | undefined;
+
 						try {
 							language = await p;
 						} catch (err) {
@@ -96,8 +99,10 @@ export default abstract class Languages {
 		languageId: string,
 	): Promise<Parser.Language | undefined> {
 		let infoOrLanguage = this._languageInstances.get(languageId);
+
 		if (infoOrLanguage === undefined) {
 			console.warn(`UNKNOWN languages: '${languageId}'`);
+
 			return undefined;
 		}
 		return infoOrLanguage.promise;
@@ -113,16 +118,20 @@ export default abstract class Languages {
 		strict = false,
 	): Parser.Query {
 		const languageId = this._languageIdByLanguage.get(language)!;
+
 		const module = _queryModules.get(languageId);
+
 		if (!module) {
 			// unknown language or invalid query (deleted after failed parse attempt)
 			return language.query("");
 		}
 
 		const source = module[type] ?? "";
+
 		const key = `${languageId}/${type}`;
 
 		let query = this._queryInstances.get(key);
+
 		if (!query) {
 			try {
 				query = language.query(source);
@@ -130,6 +139,7 @@ export default abstract class Languages {
 				query = language.query("");
 				console.error(languageId, e);
 				console.log(language);
+
 				if (strict) {
 					throw e;
 				}
@@ -144,6 +154,7 @@ export default abstract class Languages {
 		types: QueryType[],
 	): string[] {
 		const result: string[] = [];
+
 		for (const [info] of this._langConfiguration) {
 			for (const type of types) {
 				if (
@@ -151,6 +162,7 @@ export default abstract class Languages {
 					this._configurations.get(info.languageId)?.[feature]
 				) {
 					result.push(info.languageId);
+
 					break;
 				}
 			}
@@ -160,6 +172,7 @@ export default abstract class Languages {
 
 	static getLanguageIdByUri(uri: string): string {
 		let end = uri.lastIndexOf("?");
+
 		if (end < 0) {
 			end = uri.lastIndexOf("#");
 		}
@@ -167,7 +180,9 @@ export default abstract class Languages {
 			uri = uri.substring(0, end);
 		}
 		const start = uri.lastIndexOf(".");
+
 		const suffix = uri.substring(start + 1);
+
 		for (let [info] of this._langConfiguration) {
 			for (let candidate of info.suffixes) {
 				if (candidate === suffix) {

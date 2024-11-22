@@ -32,6 +32,7 @@ export class Language {
 
 	fetchLanguageData() {
 		this._data ??= this._loadData();
+
 		return this._data;
 	}
 }

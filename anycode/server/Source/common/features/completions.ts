@@ -37,7 +37,9 @@ export class CompletionItemProvider {
 		const document = await this._documents.retrieve(
 			params.textDocument.uri,
 		);
+
 		const tree = await this._trees.getParseTree(document);
+
 		if (!tree) {
 			return [];
 		}
@@ -46,7 +48,9 @@ export class CompletionItemProvider {
 
 		// (1) all identifiers that are used in this file
 		const query = Languages.getQuery(tree.getLanguage(), "identifiers");
+
 		const captures = query.captures(tree.rootNode);
+
 		for (const capture of captures) {
 			const text = capture.node.text;
 			result.set(text, { label: text });
@@ -68,6 +72,7 @@ export class CompletionItemProvider {
 							firstDefinitionKind,
 						),
 					});
+
 					break;
 				}
 			}
@@ -75,7 +80,9 @@ export class CompletionItemProvider {
 
 		// remove current identifier (the one that's being typed)
 		const current = nodeAtPosition(tree.rootNode, params.position, true);
+
 		const currentCaptures = query.captures(current);
+
 		if (currentCaptures.length === 1) {
 			result.delete(currentCaptures[0].node.text);
 		}

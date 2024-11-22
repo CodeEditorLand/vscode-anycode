@@ -39,11 +39,14 @@ export class DocumentHighlightsProvider {
 		);
 
 		const info = await Locals.create(document, this._trees);
+
 		const anchor = info.root.findDefinitionOrUsage(params.position);
+
 		if (!anchor) {
 			return this._identifierBasedHighlights(document, params.position);
 		}
 		const result: lsp.DocumentHighlight[] = [];
+
 		for (let def of anchor.scope.findDefinitions(anchor.name)) {
 			result.push(
 				lsp.DocumentHighlight.create(
@@ -72,13 +75,17 @@ export class DocumentHighlightsProvider {
 		position: lsp.Position,
 	): Promise<lsp.DocumentHighlight[]> {
 		const result: lsp.DocumentHighlight[] = [];
+
 		const tree = await this._trees.getParseTree(document);
+
 		if (!tree) {
 			return result;
 		}
 
 		const query = Languages.getQuery(tree.getLanguage(), "identifiers");
+
 		const candidate = identifierAtPosition(query, tree.rootNode, position);
+
 		if (!candidate) {
 			// not on an identifier
 			return result;

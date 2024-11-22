@@ -14,6 +14,7 @@ export class FileSymbolStorage implements SymbolInfoStorage {
 
 	insert(uri: string, info: Map<string, SymbolInfo>): void {
 		const flatInfo: Array<string | number> = [];
+
 		for (let [word, i] of info) {
 			flatInfo.push(word);
 			flatInfo.push(i.definitions.size);
@@ -51,18 +52,24 @@ export class FileSymbolStorage implements SymbolInfoStorage {
 		this._data.clear();
 
 		const result = new Map<string, Map<string, SymbolInfo>>();
+
 		try {
 			const raw =
 				await this._connection.sendRequest<string>("persisted/read");
+
 			const data = <[string, Array<string | number>][]>JSON.parse(raw);
 
 			for (let [uri, flatInfo] of data) {
 				this._data.set(uri, flatInfo);
+
 				const info = new Map<string, SymbolInfo>();
 				result.set(uri, info);
+
 				for (let i = 0; i < flatInfo.length; ) {
 					let word = <string>flatInfo[i];
+
 					let defLen = <number>flatInfo[++i];
+
 					let kindStart = ++i;
 
 					for (

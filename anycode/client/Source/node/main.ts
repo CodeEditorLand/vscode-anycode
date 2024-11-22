@@ -54,7 +54,9 @@ export async function activate(context: vscode.ExtensionContext) {
 				const persistUri =
 					context.storageUri &&
 					vscode.Uri.joinPath(context.storageUri, "anycode.db");
+
 				const encoder = new TextEncoder();
+
 				const decoder = new TextDecoder();
 
 				client.onRequest(
@@ -66,6 +68,7 @@ export async function activate(context: vscode.ExtensionContext) {
 						try {
 							const data =
 								await vscode.workspace.fs.readFile(persistUri);
+
 							return decoder.decode(data);
 						} catch {
 							return "";

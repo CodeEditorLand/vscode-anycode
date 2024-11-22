@@ -31,16 +31,20 @@ export async function startClient(
 	context: vscode.ExtensionContext,
 ) {
 	const channel = vscode.window.createOutputChannel("anycode");
+
 	const reporter = new TelemetryReporter(
 		context.extension.packageJSON["aiKey"],
 	);
+
 	const sender: vscode.TelemetrySender = {
 		sendEventData(event, data) {
 			reporter.sendTelemetryEvent(event, data);
 		},
 		sendErrorData() {},
 	};
+
 	const telemetry = vscode.env.createTelemetryLogger(sender);
+
 	const supportedLanguages = new SupportedLanguages(channel);
 
 	context.subscriptions.push(reporter, telemetry);
@@ -63,7 +67,9 @@ export async function startClient(
 	async function stopServers() {
 		const oldHandles = serverHandles.slice(0);
 		serverHandles = [];
+
 		const result = await Promise.allSettled(oldHandles);
+
 		for (const item of result) {
 			if (item.status === "fulfilled") {
 				item.value.dispose();
@@ -93,6 +99,7 @@ function _updateStatusAndInfo(
 	_statusItem.selector = selector;
 	_statusItem.severity = vscode.LanguageStatusSeverity.Warning;
 	_statusItem.text = `Partial Mode`;
+
 	if (showCommandHint) {
 		_statusItem.detail =
 			"Language support is inaccurate in this context. $(lightbulb-autofix) Did not index all files because search [indexing is disabled](command:remoteHub.enableIndexing).";
@@ -116,8 +123,10 @@ async function _startServer(
 ): Promise<vscode.Disposable> {
 	const supportedLanguages =
 		await supportedLanguagesInfo.getSupportedLanguages();
+
 	const documentSelector =
 		await supportedLanguagesInfo.getSupportedLanguagesAsSelector();
+
 	if (documentSelector.length === 0) {
 		log.appendLine("[anycode] NO supported languages, no server needed");
 		// no supported languages -> nothing to do
@@ -135,6 +144,7 @@ async function _startServer(
 	}
 
 	const disposables: vscode.Disposable[] = [];
+
 	const databaseName = context.workspaceState.get(
 		"dbName",
 		`anycode_${Math.random().toString(32).slice(2)}`,
@@ -144,6 +154,7 @@ async function _startServer(
 	// Build a glob-patterns for languages which have features enabled, like workspace symbol search,
 	// and use this pattern for initial file discovery and file watching
 	const findAndSearchSuffixes: string[][] = [];
+
 	for (const [lang, config] of supportedLanguages) {
 		if (
 			config.workspaceSymbols ||
@@ -154,6 +165,7 @@ async function _startServer(
 		}
 	}
 	const langPattern = `**/*.{${findAndSearchSuffixes.join(",")}}`;
+
 	const watcher = vscode.workspace.createFileSystemWatcher(langPattern);
 	disposables.push(watcher);
 
@@ -161,6 +173,7 @@ async function _startServer(
 		context.extensionUri,
 		"./server/node_modules/web-tree-sitter/tree-sitter.wasm",
 	);
+
 	const initializationOptions: InitOptions = {
 		treeSitterWasmUri:
 			"importScripts" in globalThis
@@ -183,14 +196,17 @@ async function _startServer(
 		middleware: {
 			provideWorkspaceSymbols(query, token, next) {
 				_sendFeatureTelementry("workspaceSymbols", "");
+
 				return next(query, token);
 			},
 			provideDefinition(document, position, token, next) {
 				_sendFeatureTelementry("definition", document.languageId);
+
 				return next(document, position, token);
 			},
 			provideReferences(document, position, options, token, next) {
 				_sendFeatureTelementry("references", document.languageId);
+
 				return next(document, position, options, token);
 			},
 			provideDocumentHighlights(document, position, token, next) {
@@ -198,10 +214,12 @@ async function _startServer(
 					"documentHighlights",
 					document.languageId,
 				);
+
 				return next(document, position, token);
 			},
 			provideCompletionItem(document, position, context, token, next) {
 				_sendFeatureTelementry("completions", document.languageId);
+
 				return next(document, position, context, token);
 			},
 		},
@@ -250,6 +268,7 @@ async function _startServer(
 			)
 			.then(async (all) => {
 				let hasWorkspaceContents = 0;
+
 				if (all.length > 50) {
 					// we have quite some files. let's check if we can read them without limits.
 					// for remotehub this means try to fetch the repo-tar first
@@ -288,16 +307,20 @@ async function _startServer(
 				// and only then we starting indexing all files matching the language. this is
 				// done with the "unleash" message
 				const suffixesByLangId = new Map<string, Language>();
+
 				for (const [lang] of supportedLanguages) {
 					suffixesByLangId.set(lang.info.languageId, lang);
 				}
 				const handleTextDocument = async (doc: vscode.TextDocument) => {
 					const lang = suffixesByLangId.get(doc.languageId);
+
 					if (!lang) {
 						return;
 					}
 					suffixesByLangId.delete(doc.languageId);
+
 					const langData = await lang.fetchLanguageData();
+
 					const initLang = client.sendRequest(
 						CustomMessages.QueueUnleash,
 						[lang.info, langData],
@@ -318,6 +341,7 @@ async function _startServer(
 						listener.dispose();
 					}
 				};
+
 				const listener =
 					vscode.workspace.onDidOpenTextDocument(handleTextDocument);
 				disposables.push(listener);
@@ -341,9 +365,11 @@ async function _startServer(
 				// we are dealing with a notebook
 				try {
 					const doc = await vscode.workspace.openTextDocument(uri);
+
 					return Array.from(new TextEncoder().encode(doc.getText()));
 				} catch (err) {
 					console.warn(err);
+
 					return [];
 				}
 			}
@@ -357,8 +383,10 @@ async function _startServer(
 			}
 
 			let data: number[];
+
 			try {
 				const stat = await vscode.workspace.fs.stat(uri);
+
 				if (stat.size > 5 * 1024 ** 2) {
 					console.warn(
 						`IGNORING "${uri.toString()}" because it is too large (${stat.size}bytes)`,
@@ -371,6 +399,7 @@ async function _startServer(
 			} catch (err) {
 				// graceful
 				console.warn(err);
+
 				return [];
 			}
 		},
@@ -383,6 +412,7 @@ function _getRemoteHubExtension() {
 	type RemoteHubApiStub = {
 		loadWorkspaceContents?(workspaceUri: vscode.Uri): Promise<boolean>;
 	};
+
 	const remoteHub =
 		vscode.extensions.getExtension<RemoteHubApiStub>(
 			"ms-vscode.remote-repositories",
@@ -429,6 +459,7 @@ async function _canInitWithoutLimits() {
 	const remoteHub = _getRemoteHubExtension();
 
 	const remoteHubApi = await remoteHub?.activate();
+
 	if (typeof remoteHubApi?.loadWorkspaceContents !== "function") {
 		// no remotehub or bad version
 		return false;

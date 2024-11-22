@@ -24,10 +24,12 @@ export class IndexedDBSymbolStorage implements SymbolInfoStorage {
 			request.onerror = () => reject(request.error);
 			request.onsuccess = () => {
 				const db = request.result;
+
 				if (!db.objectStoreNames.contains(this._store)) {
 					console.error(
 						`Error while opening IndexedDB. Could not find '${this._store}' object store`,
 					);
+
 					return resolve(this._delete(db).then(() => this.open()));
 				} else {
 					resolve(undefined);
@@ -36,6 +38,7 @@ export class IndexedDBSymbolStorage implements SymbolInfoStorage {
 			};
 			request.onupgradeneeded = () => {
 				const db = request.result;
+
 				if (db.objectStoreNames.contains(this._store)) {
 					db.deleteObjectStore(this._store);
 				}
@@ -68,6 +71,7 @@ export class IndexedDBSymbolStorage implements SymbolInfoStorage {
 
 	insert(uri: string, info: Map<string, SymbolInfo>) {
 		const flatInfo: Array<string | number> = [];
+
 		for (let [word, i] of info) {
 			flatInfo.push(word);
 			flatInfo.push(i.definitions.size);
@@ -93,8 +97,10 @@ export class IndexedDBSymbolStorage implements SymbolInfoStorage {
 				return reject(new Error("invalid state"));
 			}
 			const t = this._db.transaction(this._store, "readwrite");
+
 			const toInsert = new Map(this._insertQueue);
 			this._insertQueue.clear();
+
 			for (let [uri, data] of toInsert) {
 				t.objectStore(this._store).put(data, uri);
 			}
@@ -109,19 +115,27 @@ export class IndexedDBSymbolStorage implements SymbolInfoStorage {
 				return reject(new Error("invalid state"));
 			}
 			const entries = new Map<string, Map<string, SymbolInfo>>();
+
 			const t = this._db.transaction(this._store, "readonly");
+
 			const store = t.objectStore(this._store);
+
 			const cursor = store.openCursor();
 			cursor.onsuccess = () => {
 				if (!cursor.result) {
 					resolve(entries);
+
 					return;
 				}
 				const info = new Map<string, SymbolInfo>();
+
 				const flatInfo = <Array<string | number>>cursor.result.value;
+
 				for (let i = 0; i < flatInfo.length; ) {
 					let word = <string>flatInfo[i];
+
 					let defLen = <number>flatInfo[++i];
+
 					let kindStart = ++i;
 
 					for (
@@ -157,6 +171,7 @@ export class IndexedDBSymbolStorage implements SymbolInfoStorage {
 				return reject(new Error("invalid state"));
 			}
 			const t = this._db.transaction(this._store, "readwrite");
+
 			const store = t.objectStore(this._store);
 
 			for (const uri of uris) {

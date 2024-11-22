@@ -57,18 +57,21 @@ export function startServer(connection: Connection, factory: IStorageFactory) {
 					return initData.treeSitterWasmUri;
 				},
 			};
+
 			try {
 				await Parser.init(options);
 			} catch (e) {
 				console.error("FAILED to initialize tree-sitter");
 				console.error(typeof e);
 				console.error(e);
+
 				throw e;
 			}
 			Languages.init(initData.supportedLanguages);
 
 			// setup features
 			const documents = new DocumentStore(connection);
+
 			const trees = new Trees(documents);
 
 			// caching
@@ -99,9 +102,11 @@ export function startServer(connection: Connection, factory: IStorageFactory) {
 
 			// manage symbol index. add/remove files as they are disovered and edited
 			documents.all().forEach((doc) => symbolIndex.addFile(doc.uri));
+
 			documents.onDidOpen((event) =>
 				symbolIndex.addFile(event.document.uri),
 			);
+
 			documents.onDidChangeContent((event) =>
 				symbolIndex.addFile(event.document.uri),
 			);
@@ -127,14 +132,21 @@ export function startServer(connection: Connection, factory: IStorageFactory) {
 					switch (type) {
 						case FileChangeType.Created:
 							symbolIndex.addFile(uri);
+
 							break;
+
 						case FileChangeType.Deleted:
 							symbolIndex.removeFile(uri);
+
 							documents.removeFile(uri);
+
 							break;
+
 						case FileChangeType.Changed:
 							symbolIndex.addFile(uri);
+
 							documents.removeFile(uri);
+
 							break;
 					}
 				}

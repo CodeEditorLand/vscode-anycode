@@ -43,12 +43,15 @@ export class ReferencesProvider {
 
 		// find references inside file
 		const info = await Locals.create(document, this._trees);
+
 		const anchor = info.root.findDefinitionOrUsage(params.position);
 
 		if (anchor && !anchor.scope.likelyExports) {
 			const definitions = anchor.scope.findDefinitions(anchor.name);
+
 			if (definitions.length > 0) {
 				const result: lsp.Location[] = [];
+
 				for (let def of definitions) {
 					if (params.context.includeDeclaration) {
 						result.push(
@@ -57,6 +60,7 @@ export class ReferencesProvider {
 					}
 				}
 				const usages = anchor.scope.findUsages(anchor.name);
+
 				for (let usage of usages) {
 					result.push(lsp.Location.create(document.uri, usage.range));
 				}
@@ -78,26 +82,32 @@ export class ReferencesProvider {
 		includeDeclaration: boolean,
 	): Promise<lsp.Location[]> {
 		const tree = await this._trees.getParseTree(document);
+
 		if (!tree) {
 			return [];
 		}
 
 		const query = Languages.getQuery(tree.getLanguage(), "identifiers");
+
 		const ident = identifierAtPosition(
 			query,
 			tree.rootNode,
 			position,
 		)?.text;
+
 		if (!ident) {
 			// not an identifier
 			return [];
 		}
 
 		const result: lsp.Location[] = [];
+
 		let seenAsUsage = false;
+
 		let seenAsDef = false;
 
 		const usages = await this._symbols.getUsages(ident, document);
+
 		for (let usage of usages) {
 			seenAsUsage =
 				seenAsUsage || containsPosition(usage.range, position);
@@ -105,8 +115,10 @@ export class ReferencesProvider {
 		}
 
 		const definitions = await this._symbols.getDefinitions(ident, document);
+
 		for (const { location } of definitions) {
 			seenAsDef = seenAsDef || containsPosition(location.range, position);
+
 			if (includeDeclaration) {
 				result.push(location);
 			}
@@ -132,17 +144,20 @@ export async function getDocumentUsages(
 	trees: Trees,
 ): Promise<IUsage[]> {
 	const tree = await trees.getParseTree(document);
+
 	if (!tree) {
 		return [];
 	}
 
 	const query = Languages.getQuery(tree.getLanguage(), "references");
+
 	const captures = query.captures(tree.rootNode);
 
 	const result: IUsage[] = [];
 
 	for (let capture of captures) {
 		const name = capture.node.text;
+
 		const range = asLspRange(capture.node);
 		result.push({
 			name,

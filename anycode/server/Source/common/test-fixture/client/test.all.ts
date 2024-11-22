@@ -28,6 +28,7 @@ import * as queries from "./queries.test";
 
 		// @ts-expect-error
 		const target = new URL(window.location);
+
 		const langInfo: LanguageInfo[] = JSON.parse(
 			target.searchParams.get("languages") ?? "",
 		);
@@ -41,6 +42,7 @@ import * as queries from "./queries.test";
 
 		for (let info of langInfo) {
 			const data = await fetch((<any>info).wasmUri);
+
 			const base64 = encodeBase64(
 				new Uint8Array(await data.arrayBuffer()),
 			);
@@ -51,12 +53,14 @@ import * as queries from "./queries.test";
 		}
 
 		const outline = target.searchParams.get("outline");
+
 		if (outline) {
 			const langId = Languages.getLanguageIdByUri(outline);
 			await documentSymbols.init(outline, langId);
 		}
 
 		const highlights = target.searchParams.get("highlights");
+
 		if (highlights) {
 			const langId = Languages.getLanguageIdByUri(highlights);
 			await documentHighlights.init(highlights, langId);

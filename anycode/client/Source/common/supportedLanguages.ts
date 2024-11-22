@@ -92,25 +92,31 @@ export class SupportedLanguages {
 				const config = vscode.workspace.getConfiguration("anycode", {
 					languageId: language.info.languageId,
 				});
+
 				const featureConfig: FeatureConfig = {
 					...config.get<FeatureConfig>(`language.features`),
 				};
+
 				const empty = Object.keys(featureConfig).every(
 					(key) => !(<Record<string, any>>featureConfig)[key],
 				);
+
 				if (empty) {
 					this._log.appendLine(
 						`[CONFIG] ignoring ${language.info.languageId} because configuration IS EMPTY`,
 					);
+
 					continue;
 				}
 
 				if (language.info.suppressedBy) {
 					const inspectConfig = config.inspect("language.features");
+
 					const explicitlyEnabled =
 						inspectConfig?.globalLanguageValue ||
 						inspectConfig?.workspaceLanguageValue ||
 						inspectConfig?.workspaceFolderLanguageValue;
+
 					if (
 						!explicitlyEnabled &&
 						language.info.suppressedBy.some((id) =>
@@ -120,6 +126,7 @@ export class SupportedLanguages {
 						this._log.appendLine(
 							`[CONFIG] ignoring ${language.info.languageId} because it is SUPPRESSED by any of [${language.info.suppressedBy.join(", ")}]`,
 						);
+
 						continue;
 					}
 				}
@@ -133,6 +140,7 @@ export class SupportedLanguages {
 
 	async getSupportedLanguagesAsSelector(): Promise<string[]> {
 		const languages = await this.getSupportedLanguages();
+
 		return Array.from(languages.keys()).map(
 			(language) => language.info.languageId,
 		);
@@ -149,6 +157,7 @@ export class SupportedLanguages {
 			let languages = (<Contribution | undefined>(
 				extension.packageJSON.contributes
 			))?.["anycodeLanguages"];
+
 			if (!languages) {
 				// not for me...
 				continue;
@@ -164,6 +173,7 @@ export class SupportedLanguages {
 						`INVALID anycode-language contribution from ${extension.id}`,
 						lang,
 					);
+
 					continue;
 				}
 
@@ -182,10 +192,12 @@ export class SupportedLanguages {
 							lang.grammarPath,
 						),
 					);
+
 					const queries = await SupportedLanguages._readQueryPath(
 						extension,
 						lang.queryPaths,
 					);
+
 					return new LanguageData(encodeBase64(grammar), queries);
 				});
 
@@ -205,8 +217,11 @@ export class SupportedLanguages {
 		paths: JSONQueryPaths,
 	): Promise<Queries> {
 		type Writeable<T> = { -readonly [P in keyof T]: Writeable<T[P]> };
+
 		const decoder = new TextDecoder();
+
 		const result: Writeable<Queries> = {};
+
 		if (paths.comments) {
 			result.comments = decoder.decode(
 				await vscode.workspace.fs.readFile(

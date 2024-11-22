@@ -23,13 +23,17 @@ export class Locals {
 			lsp.Range.create(0, 0, document.lineCount, 0),
 			true,
 		);
+
 		const tree = await trees.getParseTree(document);
+
 		if (!tree) {
 			return new Locals(document, root);
 		}
 
 		const all: Node[] = [];
+
 		const query = Languages.getQuery(tree.getLanguage(), "locals");
+
 		const captures = query
 			.captures(tree.rootNode)
 			.sort(this._compareCaptures);
@@ -39,8 +43,10 @@ export class Locals {
 		const scopeCaptures = captures.filter((capture) =>
 			capture.name.startsWith("scope"),
 		);
+
 		for (let i = 0; i < scopeCaptures.length; i++) {
 			const capture = scopeCaptures[i];
+
 			const range = asLspRange(capture.node);
 			all.push(new Scope(range, capture.name.endsWith(".exports")));
 		}
@@ -53,6 +59,7 @@ export class Locals {
 
 		const info = new Locals(document, root);
 		// info.debugPrint();
+
 		return info;
 	}
 
@@ -83,6 +90,7 @@ export class Locals {
 
 	private static _constructTree(root: Scope, nodes: Node[]): void {
 		const stack: Node[] = [];
+
 		for (const thing of nodes.sort(this._compareByRange)) {
 			while (true) {
 				let parent = stack.pop() ?? root;
@@ -96,6 +104,7 @@ export class Locals {
 
 					stack.push(parent);
 					stack.push(thing);
+
 					break;
 				}
 				if (parent === root) {
@@ -108,8 +117,10 @@ export class Locals {
 		// remove helper usage-nodes
 		stack.length = 0;
 		stack.push(root);
+
 		while (stack.length > 0) {
 			let n = stack.pop()!;
+
 			if (n instanceof Usage && n.isHelper) {
 				n.remove();
 			} else {
@@ -160,10 +171,12 @@ abstract class Node {
 			return false;
 		}
 		const idx = this._parent._children.indexOf(this);
+
 		if (idx < 0) {
 			return false;
 		}
 		this._parent._children.splice(idx, 1);
+
 		return true;
 	}
 
@@ -264,6 +277,7 @@ export class Scope extends Node {
 		position: lsp.Position,
 	): Definition | Usage | undefined {
 		let scope = this._findScope(position);
+
 		while (true) {
 			for (let child of scope._children) {
 				if (
@@ -283,6 +297,7 @@ export class Scope extends Node {
 
 	findDefinitions(text: string): Definition[] {
 		const result: Definition[] = [];
+
 		for (let child of this.definitions()) {
 			if (child.name === text) {
 				result.push(child);
@@ -302,6 +317,7 @@ export class Scope extends Node {
 
 		// find higest scope defining
 		let scope: Scope = this;
+
 		while (!scope._defines(text)) {
 			if (scope._parent instanceof Scope) {
 				scope = scope._parent;
@@ -311,12 +327,14 @@ export class Scope extends Node {
 		}
 		// find usages in all child scope (unless also defined there)
 		scope._findUsagesDown(text, bucket);
+
 		return bucket.flat();
 	}
 
 	private _findUsagesDown(text: string, bucket: Usage[][]): void {
 		// usages in this scope
 		const result: Usage[] = [];
+
 		for (let child of this.usages()) {
 			if (child.name === text) {
 				result.push(child);
@@ -343,6 +361,7 @@ export class Scope extends Node {
 
 	toString(depth: number = 0): string {
 		let scopes: string[] = [];
+
 		let parts: string[] = [];
 
 		this._children.slice(0).forEach((child) => {
@@ -354,6 +373,7 @@ export class Scope extends Node {
 		});
 
 		let indent = " ".repeat(depth);
+
 		let res = `${indent}Scope@${this.range.start.line},${this.range.start.character}-${this.range.end.line},${this.range.end.character}`;
 		res += `\n${indent + indent}${parts.join(`, `)}`;
 		res += `\n${indent}${scopes.join(`\n${indent}`)}`;

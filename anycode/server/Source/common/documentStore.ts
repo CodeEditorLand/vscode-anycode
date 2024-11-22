@@ -34,7 +34,9 @@ export class DocumentStore extends TextDocuments<TextDocument> {
 			create: TextDocument.create,
 			update: (doc, changes, version) => {
 				let result: TextDocument;
+
 				let incremental = true;
+
 				let event: TextDocumentChange2 = { document: doc, changes: [] };
 
 				for (const change of changes) {
@@ -44,6 +46,7 @@ export class DocumentStore extends TextDocuments<TextDocument> {
 						)
 					) {
 						incremental = false;
+
 						break;
 					}
 					const rangeOffset = doc.offsetAt(change.range.start);
@@ -57,6 +60,7 @@ export class DocumentStore extends TextDocuments<TextDocument> {
 					});
 				}
 				result = TextDocument.update(doc, changes, version);
+
 				if (incremental) {
 					this._onDidChangeContent2.fire(event);
 				}
@@ -74,10 +78,12 @@ export class DocumentStore extends TextDocuments<TextDocument> {
 
 	async retrieve(uri: string): Promise<TextDocument> {
 		let result = this.get(uri);
+
 		if (result) {
 			return result;
 		}
 		let promise = this._fileDocuments.get(uri);
+
 		if (!promise) {
 			promise = this._requestDocument(uri);
 			this._fileDocuments.set(uri, promise);
@@ -90,7 +96,9 @@ export class DocumentStore extends TextDocuments<TextDocument> {
 			CustomMessages.FileRead,
 			uri,
 		);
+
 		const bytes = new Uint8Array(reply);
+
 		return TextDocument.create(
 			uri,
 			Languages.getLanguageIdByUri(uri),

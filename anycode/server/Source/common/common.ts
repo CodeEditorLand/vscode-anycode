@@ -11,6 +11,7 @@ export type SymbolMapping = {
 		symbolKind: string,
 		strict: boolean,
 	): lsp.SymbolKind | undefined;
+
 	getSymbolKind(symbolKind: string): lsp.SymbolKind;
 };
 
@@ -45,12 +46,15 @@ export const symbolMapping: SymbolMapping = new (class {
 	]);
 
 	getSymbolKind(symbolKind: string): lsp.SymbolKind;
+
 	getSymbolKind(symbolKind: string, strict: true): lsp.SymbolKind | undefined;
+
 	getSymbolKind(
 		symbolKind: string,
 		strict?: true,
 	): lsp.SymbolKind | undefined {
 		const res = this._symbolKindMapping.get(symbolKind);
+
 		if (!res && strict) {
 			return undefined;
 		}
@@ -76,7 +80,9 @@ export function identifierAtPosition(
 ): Parser.SyntaxNode | undefined {
 	// `foo|::bar` -> finds `::`
 	let candidate = nodeAtPosition(node, position, false);
+
 	let capture = identQuery.captures(candidate);
+
 	if (capture.length === 1) {
 		return candidate;
 	}
@@ -84,6 +90,7 @@ export function identifierAtPosition(
 	// `foo|::bar` -> finds `foo`
 	candidate = nodeAtPosition(node, position, true);
 	capture = identQuery.captures(candidate);
+
 	if (capture.length === 1) {
 		return candidate;
 	}
@@ -97,6 +104,7 @@ export function nodeAtPosition(
 ): Parser.SyntaxNode {
 	for (const child of node.children) {
 		const range = asLspRange(child);
+
 		if (isBeforeOrEqual(range.start, position)) {
 			if (isBefore(position, range.end)) {
 				return nodeAtPosition(child, position, leftBias);
@@ -198,12 +206,15 @@ export async function parallel<R>(
 	token: lsp.CancellationToken,
 ): Promise<R[]> {
 	let result: R[] = [];
+
 	let pos = 0;
+
 	while (true) {
 		if (token.isCancellationRequested) {
 			throw new Error("cancelled");
 		}
 		const partTasks = tasks.slice(pos, pos + degree);
+
 		if (partTasks.length === 0) {
 			break;
 		}

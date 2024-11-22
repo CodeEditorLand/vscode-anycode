@@ -31,11 +31,13 @@ class Queue {
 			n = this._queue.size;
 		}
 		const result: string[] = [];
+
 		for (const uri of this._queue) {
 			if (!filter(uri)) {
 				continue;
 			}
 			this._queue.delete(uri);
+
 			if (result.push(uri) >= n) {
 				break;
 			}
@@ -46,6 +48,7 @@ class Queue {
 
 export interface SymbolInfoStorage {
 	insert(uri: string, info: Map<string, SymbolInfo>): void;
+
 	getAll(): Promise<Map<string, Map<string, SymbolInfo>>>;
 	delete(uris: Set<string>): Promise<void>;
 }
@@ -100,6 +103,7 @@ class Index {
 		// (2) insert new symbol information
 		for (const [name, kinds] of value) {
 			const all = this._index.get(name);
+
 			if (all) {
 				all.set(uri, kinds);
 			} else {
@@ -111,6 +115,7 @@ class Index {
 		this._cleanup.set(uri, () => {
 			for (const name of value.keys()) {
 				const all = this._index.get(name);
+
 				if (all) {
 					if (all.delete(uri) && all.size === 0) {
 						this._index.delete(name);
@@ -122,9 +127,11 @@ class Index {
 
 	delete(uri: lsp.DocumentUri): boolean {
 		const cleanupFn = this._cleanup.get(uri);
+
 		if (cleanupFn) {
 			cleanupFn();
 			this._cleanup.delete(uri);
+
 			return true;
 		}
 		return false;
@@ -182,10 +189,12 @@ export class SymbolIndex {
 
 	async update(): Promise<void> {
 		await this._currentUpdate;
+
 		const uris = this._syncQueue.consume(undefined, (uri) =>
 			this._suffixFilter.accept(uri),
 		);
 		this._currentUpdate = this._doUpdate(uris, false);
+
 		return this._currentUpdate;
 	}
 
@@ -193,7 +202,9 @@ export class SymbolIndex {
 		if (uris.length !== 0) {
 			// schedule a new task to update the cache for changed uris
 			const sw = new StopWatch();
+
 			const tasks = uris.map(this._createIndexTask, this);
+
 			const stats = await parallel(
 				tasks,
 				50,
@@ -201,7 +212,9 @@ export class SymbolIndex {
 			);
 
 			let totalRetrieve = 0;
+
 			let totalIndex = 0;
+
 			for (let stat of stats) {
 				totalRetrieve += stat.durationRetrieve;
 				totalIndex += stat.durationIndex;
@@ -219,7 +232,9 @@ export class SymbolIndex {
 		return async () => {
 			// fetch document
 			const _t1Retrieve = performance.now();
+
 			const document = await this._documents.retrieve(uri);
+
 			const durationRetrieve = performance.now() - _t1Retrieve;
 
 			// remove current data
@@ -227,6 +242,7 @@ export class SymbolIndex {
 
 			// update index
 			const _t1Index = performance.now();
+
 			try {
 				await this._doIndex(document);
 			} catch (e) {
@@ -251,6 +267,7 @@ export class SymbolIndex {
 		}
 		for (const symbol of symbols) {
 			const all = symbolInfo.get(symbol.name);
+
 			if (all) {
 				all.definitions.add(symbol.kind);
 			} else {
@@ -267,6 +284,7 @@ export class SymbolIndex {
 		}
 		for (const usage of usages) {
 			const all = symbolInfo.get(usage.name);
+
 			if (all) {
 				all.usages.add(usage.kind);
 			} else {
@@ -284,10 +302,13 @@ export class SymbolIndex {
 
 	async initFiles(_uris: string[]) {
 		const uris = new Set(_uris);
+
 		const sw = new StopWatch();
 
 		console.log(`[index] initializing index for ${uris.size} files.`);
+
 		const persisted = await this._symbolInfoStorage.getAll();
+
 		const obsolete = new Set<string>();
 
 		for (const [uri, data] of persisted) {
@@ -325,13 +346,16 @@ export class SymbolIndex {
 			const uris = this._asyncQueue.consume(70, (uri) =>
 				this._suffixFilter.accept(uri),
 			);
+
 			if (uris.length === 0) {
 				return;
 			}
 			const t1 = performance.now();
 			await this._doUpdate(uris, true);
+
 			setTimeout(() => asyncUpdate(), (performance.now() - t1) * 4);
 		};
+
 		asyncUpdate();
 	}
 
@@ -341,9 +365,11 @@ export class SymbolIndex {
 		await this.update();
 
 		const result: lsp.SymbolInformation[] = [];
+
 		let sameLanguageOffset = 0;
 
 		const all = this.index.get(ident) ?? [];
+
 		const work: Promise<any>[] = [];
 
 		for (const [uri, value] of all) {
@@ -358,11 +384,13 @@ export class SymbolIndex {
 					.then(async (document) => {
 						const isSameLanguage =
 							source.languageId === document.languageId;
+
 						const symbols = await getDocumentSymbols(
 							document,
 							this._trees,
 							true,
 						);
+
 						for (const item of symbols) {
 							if (item.name === ident) {
 								const info = lsp.SymbolInformation.create(
@@ -371,6 +399,7 @@ export class SymbolIndex {
 									item.selectionRange,
 									uri,
 								);
+
 								if (isSameLanguage) {
 									result.unshift(info);
 									sameLanguageOffset++;
@@ -405,7 +434,9 @@ export class SymbolIndex {
 		const result: lsp.Location[] = [];
 
 		const all = this.index.get(ident) ?? [];
+
 		const work: Promise<any>[] = [];
+
 		let sameLanguageOffset = 0;
 
 		for (const [uri, value] of all) {
@@ -420,16 +451,19 @@ export class SymbolIndex {
 					.then(async (document) => {
 						const isSameLanguage =
 							source.languageId === document.languageId;
+
 						const usages = await getDocumentUsages(
 							document,
 							this._trees,
 						);
+
 						for (const item of usages) {
 							if (item.name === ident) {
 								const location = lsp.Location.create(
 									uri,
 									item.range,
 								);
+
 								if (isSameLanguage) {
 									result.unshift(location);
 									sameLanguageOffset++;

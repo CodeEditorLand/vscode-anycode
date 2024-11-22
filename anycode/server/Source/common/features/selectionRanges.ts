@@ -31,7 +31,9 @@ export class SelectionRangesProvider {
 		const document = await this._documents.retrieve(
 			params.textDocument.uri,
 		);
+
 		const tree = await this._trees.getParseTree(document);
+
 		if (!tree) {
 			return [];
 		}
@@ -40,6 +42,7 @@ export class SelectionRangesProvider {
 
 		for (const position of params.positions) {
 			const stack: Parser.SyntaxNode[] = [];
+
 			const offset = document.offsetAt(position);
 
 			let node = tree.rootNode;
@@ -56,12 +59,14 @@ export class SelectionRangesProvider {
 				if (child) {
 					stack.push(child);
 					node = child;
+
 					continue;
 				}
 				break;
 			}
 
 			let parent: lsp.SelectionRange | undefined;
+
 			for (let node of stack) {
 				let range = lsp.SelectionRange.create(asLspRange(node), parent);
 				parent = range;

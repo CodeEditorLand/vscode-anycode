@@ -12,6 +12,7 @@ class Entry<E> {
 
 export interface ReadonlyTrie<E> {
 	size: number;
+
 	get(str: string): E | undefined;
 	query(str: string[]): IterableIterator<[string, E]>;
 	[Symbol.iterator](): IterableIterator<[string, E]>;
@@ -41,11 +42,16 @@ export class Trie<E> implements ReadonlyTrie<E> {
 
 	set(str: string, element: E): void {
 		let chars = Array.from(str);
+
 		let node: Trie<E> = this;
+
 		for (let pos = 0; pos < chars.length; pos++) {
 			node._depth = Math.max(chars.length - pos, node._depth);
+
 			const ch = chars[pos];
+
 			let child = node._children.get(ch);
+
 			if (!child) {
 				child = new Trie<E>(ch, undefined);
 				node._children.set(ch, child);
@@ -62,10 +68,14 @@ export class Trie<E> implements ReadonlyTrie<E> {
 
 	get(str: string): E | undefined {
 		let chars = Array.from(str);
+
 		let node: Trie<E> = this;
+
 		for (let pos = 0; pos < chars.length; pos++) {
 			const ch = chars[pos];
+
 			let child = node._children.get(ch);
+
 			if (!child) {
 				return undefined;
 			}
@@ -76,11 +86,16 @@ export class Trie<E> implements ReadonlyTrie<E> {
 
 	delete(str: string): boolean {
 		let chars = Array.from(str);
+
 		let node: Trie<E> = this;
+
 		let path: [string, Trie<E>][] = [];
+
 		for (let pos = 0; pos < chars.length; pos++) {
 			const ch = chars[pos];
+
 			let child = node._children.get(ch);
+
 			if (!child) {
 				return false;
 			}
@@ -100,6 +115,7 @@ export class Trie<E> implements ReadonlyTrie<E> {
 		while (path.length > 0) {
 			// parent
 			const [nodeCh, parent] = path.pop()!;
+
 			if (node._children.size === 0 && !node.element) {
 				parent._children.delete(nodeCh);
 			}
@@ -109,6 +125,7 @@ export class Trie<E> implements ReadonlyTrie<E> {
 				node._depth = 0;
 			} else {
 				let newDepth = 0;
+
 				for (let child of node._children.values()) {
 					newDepth = Math.max(newDepth, child.depth);
 				}
@@ -121,6 +138,7 @@ export class Trie<E> implements ReadonlyTrie<E> {
 
 	*query(str: string[]): IterableIterator<[string, E]> {
 		const bucket = new Set<Trie<E>>();
+
 		const cache = new Map<Trie<E>, Map<number, boolean>>();
 
 		const _query = (
@@ -139,6 +157,7 @@ export class Trie<E> implements ReadonlyTrie<E> {
 			}
 
 			const map = cache.get(node);
+
 			if (map?.get(pos)) {
 				return;
 			}
@@ -152,6 +171,7 @@ export class Trie<E> implements ReadonlyTrie<E> {
 			if (pos >= str.length) {
 				// till 'node' all characters have matched
 				bucket.add(node);
+
 				return;
 			}
 
@@ -179,8 +199,10 @@ export class Trie<E> implements ReadonlyTrie<E> {
 
 	*[Symbol.iterator](): IterableIterator<[string, E]> {
 		const stack: Trie<E>[] = [this];
+
 		while (stack.length > 0) {
 			const node = stack.shift()!;
+
 			if (node.element) {
 				yield [node.element.key, node.element.value];
 			}

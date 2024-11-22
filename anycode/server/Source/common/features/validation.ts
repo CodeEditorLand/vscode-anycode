@@ -27,9 +27,11 @@ export class Validation {
 		private readonly _trees: Trees,
 	) {
 		documents.all().forEach(this._triggerValidation, this);
+
 		documents.onDidChangeContent((e) =>
 			this._triggerValidation(e.document),
 		);
+
 		documents.onDidOpen((e) => this._triggerValidation(e.document));
 
 		documents.onDidClose((e) => {
@@ -51,6 +53,7 @@ export class Validation {
 				section: "anycode",
 				scopeUri: document.uri,
 			});
+
 		if (!config.diagnostics) {
 			return;
 		}
@@ -63,19 +66,25 @@ export class Validation {
 		// schedule new validation
 		cts = new CancellationTokenSource();
 		this._currentValidation.set(document, cts);
+
 		const handle = setTimeout(() => this._createDiagnostics(document), 500);
 		cts.token.onCancellationRequested(() => clearTimeout(handle));
 	}
 
 	private async _createDiagnostics(document: TextDocument): Promise<void> {
 		const tree = await this._trees.getParseTree(document);
+
 		const diagnostics: Diagnostic[] = [];
+
 		if (tree) {
 			// find MISSING nodes (those that got auto-inserted)
 			const cursor = tree.walk();
+
 			const seen = new Set<number>();
+
 			try {
 				let visitedChildren = false;
+
 				while (true) {
 					if (cursor.nodeIsMissing && !seen.has(cursor.nodeId)) {
 						diagnostics.push({

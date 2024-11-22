@@ -17,6 +17,7 @@ import { IStorageFactory, startServer } from "../common/server";
 import { IndexedDBSymbolStorage } from "./storage";
 
 const messageReader = new BrowserMessageReader(self);
+
 const messageWriter = new BrowserMessageWriter(self);
 
 const connection = createConnection(messageReader, messageWriter);
@@ -26,11 +27,13 @@ const factory: IStorageFactory = {
 		try {
 			const result = new IndexedDBSymbolStorage(name);
 			await result.open();
+
 			return result;
 		} catch (e) {
 			console.error(
 				"FAILED to create indexedDB-based storage, using volatile in-memory storage INSTEAD",
 			);
+
 			return new MemorySymbolStorage();
 		}
 	},

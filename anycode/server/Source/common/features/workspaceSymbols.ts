@@ -37,6 +37,7 @@ export class WorkspaceSymbol {
 			for (const [uri, info] of map) {
 				for (const kind of info.definitions) {
 					const newLen = result.push(lsp.WorkspaceSymbol.create(name, kind, uri, lsp.Range.create(0, 0, 0, 0)));
+
 					if (newLen > 20_000) {
 						break out;
 					}
@@ -50,7 +51,9 @@ export class WorkspaceSymbol {
 	async resolveWorkspaceSymbol(item: lsp.WorkspaceSymbol): Promise<lsp.WorkspaceSymbol> {
 		// TODO@jrieken handle the case where a file has multiple symbols with the same name _and_ kind
 		const document = await this._documents.retrieve(item.location.uri);
+
 		const symbols = await getDocumentSymbols(document, this._trees, true);
+
 		for (let candidate of symbols) {
 			if (candidate.name === item.name && candidate.kind === item.kind) {
 				return lsp.SymbolInformation.create(item.name, item.kind, candidate.selectionRange, item.location.uri);

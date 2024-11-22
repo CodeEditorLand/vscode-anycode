@@ -41,10 +41,13 @@ export class DefinitionProvider {
 
 		// find definition in file
 		const info = await Locals.create(document, this._trees);
+
 		const anchor = info.root.findDefinitionOrUsage(params.position);
+
 		if (anchor) {
 			// find definition inside this file
 			const definitions = anchor.scope.findDefinitions(anchor.name);
+
 			if (definitions.length > 0) {
 				return definitions.map((def) =>
 					lsp.Location.create(document.uri, def.range),
@@ -54,22 +57,26 @@ export class DefinitionProvider {
 
 		// find definition globally
 		const tree = await this._trees.getParseTree(document);
+
 		if (!tree) {
 			return [];
 		}
 
 		const query = Languages.getQuery(tree.getLanguage(), "identifiers");
+
 		const ident = identifierAtPosition(
 			query,
 			tree.rootNode,
 			params.position,
 		)?.text;
+
 		if (!ident) {
 			// not an identifier
 			return [];
 		}
 
 		const symbols = await this._symbols.getDefinitions(ident, document);
+
 		return symbols.map((s) => s.location);
 	}
 }

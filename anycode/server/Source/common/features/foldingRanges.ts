@@ -32,16 +32,21 @@ export class FoldingRangeProvider {
 		const document = await this._documents.retrieve(
 			params.textDocument.uri,
 		);
+
 		const tree = await this._trees.getParseTree(document);
+
 		if (!tree) {
 			return [];
 		}
 
 		const result: lsp.FoldingRange[] = [];
+
 		const commentQuery = Languages.getQuery(tree.getLanguage(), "comments");
+
 		const commentCaptures = commentQuery.captures(tree.rootNode);
 
 		const foldingQuery = Languages.getQuery(tree.getLanguage(), "folding");
+
 		const foldingCaptures = foldingQuery.captures(tree.rootNode);
 
 		for (const capture of [commentCaptures, foldingCaptures].flat()) {
