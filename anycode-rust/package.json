@@ -22,7 +22,7 @@
 	"description": "Rust for Anycode",
 	"devDependencies": {
 		"tree-sitter-cli": "0.24.4",
-		"tree-sitter-rust": "0.23.1"
+		"tree-sitter-rust": "0.23.2"
 	},
 	"displayName": "anycode-rust",
 	"name": "anycode-rust",
