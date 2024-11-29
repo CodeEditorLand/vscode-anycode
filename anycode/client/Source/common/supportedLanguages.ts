@@ -16,18 +16,27 @@ import {
 
 type JSONQueryPaths = {
 	comments?: string;
+
 	folding?: string;
+
 	identifiers?: string;
+
 	locals?: string;
+
 	outline?: string;
+
 	references?: string;
 };
 
 type JSONAnycodeLanguage = {
 	grammarPath: string;
+
 	languageId: string;
+
 	extensions: string[];
+
 	queryPaths: JSONQueryPaths;
+
 	suppressedBy?: string[];
 };
 
@@ -35,23 +44,29 @@ function validateAnycodeLanguage(lang: JSONAnycodeLanguage): boolean {
 	if (typeof lang.grammarPath !== "string") {
 		return false;
 	}
+
 	if (typeof lang.languageId !== "string") {
 		return false;
 	}
+
 	if (!Array.isArray(lang.extensions)) {
 		return false;
 	}
+
 	if (!lang.queryPaths || typeof lang.queryPaths !== "object") {
 		return false;
 	}
+
 	if (lang.suppressedBy && !Array.isArray(lang.suppressedBy)) {
 		return false;
 	}
+
 	return true;
 }
 
 export class SupportedLanguages {
 	private readonly _onDidChange = new vscode.EventEmitter<this>();
+
 	readonly onDidChange = this._onDidChange.event;
 
 	private _tuples?: Map<Language, FeatureConfig>;
@@ -72,11 +87,13 @@ export class SupportedLanguages {
 
 	dispose(): void {
 		this._onDidChange.dispose();
+
 		this._disposable.dispose();
 	}
 
 	private _reset(): void {
 		this._tuples = undefined;
+
 		this._onDidChange.fire(this);
 	}
 
@@ -206,9 +223,11 @@ export class SupportedLanguages {
 						`extension ${extension.id} OVERWRITES language info for ${info.languageId}`,
 					);
 				}
+
 				result.set(info.languageId, language);
 			}
 		}
+
 		return result;
 	}
 
@@ -229,6 +248,7 @@ export class SupportedLanguages {
 				),
 			);
 		}
+
 		if (paths.folding) {
 			result.folding = decoder.decode(
 				await vscode.workspace.fs.readFile(
@@ -236,6 +256,7 @@ export class SupportedLanguages {
 				),
 			);
 		}
+
 		if (paths.identifiers) {
 			result.identifiers = decoder.decode(
 				await vscode.workspace.fs.readFile(
@@ -246,6 +267,7 @@ export class SupportedLanguages {
 				),
 			);
 		}
+
 		if (paths.locals) {
 			result.locals = decoder.decode(
 				await vscode.workspace.fs.readFile(
@@ -253,6 +275,7 @@ export class SupportedLanguages {
 				),
 			);
 		}
+
 		if (paths.outline) {
 			result.outline = decoder.decode(
 				await vscode.workspace.fs.readFile(
@@ -260,6 +283,7 @@ export class SupportedLanguages {
 				),
 			);
 		}
+
 		if (paths.references) {
 			result.references = decoder.decode(
 				await vscode.workspace.fs.readFile(
@@ -270,6 +294,7 @@ export class SupportedLanguages {
 				),
 			);
 		}
+
 		return result;
 	}
 }

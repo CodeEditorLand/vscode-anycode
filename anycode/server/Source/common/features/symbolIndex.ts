@@ -30,18 +30,21 @@ class Queue {
 		if (n === undefined) {
 			n = this._queue.size;
 		}
+
 		const result: string[] = [];
 
 		for (const uri of this._queue) {
 			if (!filter(uri)) {
 				continue;
 			}
+
 			this._queue.delete(uri);
 
 			if (result.push(uri) >= n) {
 				break;
 			}
 		}
+
 		return result;
 	}
 }
@@ -50,6 +53,7 @@ export interface SymbolInfoStorage {
 	insert(uri: string, info: Map<string, SymbolInfo>): void;
 
 	getAll(): Promise<Map<string, Map<string, SymbolInfo>>>;
+
 	delete(uris: Set<string>): Promise<void>;
 }
 
@@ -73,11 +77,13 @@ export class MemorySymbolStorage implements SymbolInfoStorage {
 
 export interface SymbolInfo {
 	definitions: Set<lsp.SymbolKind>;
+
 	usages: Set<lsp.SymbolKind>;
 }
 
 class Index {
 	private readonly _index = Trie.create<Map<lsp.DocumentUri, SymbolInfo>>();
+
 	private readonly _cleanup = new Map<lsp.DocumentUri, Function>();
 
 	get(text: string) {
@@ -130,16 +136,19 @@ class Index {
 
 		if (cleanupFn) {
 			cleanupFn();
+
 			this._cleanup.delete(uri);
 
 			return true;
 		}
+
 		return false;
 	}
 }
 
 class SuffixFilter {
 	private _suffixes = new Set<string>();
+
 	private _regex?: RegExp;
 
 	accept(uri: string) {
@@ -150,6 +159,7 @@ class SuffixFilter {
 		for (const item of suffixes) {
 			this._suffixes.add(item);
 		}
+
 		this._regex = new RegExp(
 			`\\.(${Array.from(this._suffixes).map(SuffixFilter._escapeRegExpCharacters).join("|")})`,
 			"i",
@@ -165,7 +175,9 @@ export class SymbolIndex {
 	readonly index = new Index();
 
 	private readonly _syncQueue = new Queue();
+
 	private readonly _asyncQueue = new Queue();
+
 	private readonly _suffixFilter = new SuffixFilter();
 
 	constructor(
@@ -176,12 +188,15 @@ export class SymbolIndex {
 
 	addFile(uri: string): void {
 		this._syncQueue.enqueue(uri);
+
 		this._asyncQueue.dequeue(uri);
 	}
 
 	removeFile(uri: string): void {
 		this._syncQueue.dequeue(uri);
+
 		this._asyncQueue.dequeue(uri);
+
 		this.index.delete(uri);
 	}
 
@@ -193,6 +208,7 @@ export class SymbolIndex {
 		const uris = this._syncQueue.consume(undefined, (uri) =>
 			this._suffixFilter.accept(uri),
 		);
+
 		this._currentUpdate = this._doUpdate(uris, false);
 
 		return this._currentUpdate;
@@ -217,6 +233,7 @@ export class SymbolIndex {
 
 			for (let stat of stats) {
 				totalRetrieve += stat.durationRetrieve;
+
 				totalIndex += stat.durationIndex;
 			}
 
@@ -248,6 +265,7 @@ export class SymbolIndex {
 			} catch (e) {
 				console.log(`FAILED to index ${uri}`, e);
 			}
+
 			const durationIndex = performance.now() - _t1Index;
 
 			return { durationRetrieve, durationIndex };
@@ -265,6 +283,7 @@ export class SymbolIndex {
 		if (!symbols) {
 			symbols = await getDocumentSymbols(document, this._trees, true);
 		}
+
 		for (const symbol of symbols) {
 			const all = symbolInfo.get(symbol.name);
 
@@ -282,6 +301,7 @@ export class SymbolIndex {
 		if (!usages) {
 			usages = await getDocumentUsages(document, this._trees);
 		}
+
 		for (const usage of usages) {
 			const all = symbolInfo.get(usage.name);
 
@@ -297,6 +317,7 @@ export class SymbolIndex {
 
 		// update in-memory index and persisted index
 		this.index.update(document.uri, symbolInfo);
+
 		this._symbolInfoStorage.insert(document.uri, symbolInfo);
 	}
 
@@ -319,6 +340,7 @@ export class SymbolIndex {
 				// restore definitions and usages and schedule async
 				// update for this file
 				this.index.update(uri, data);
+
 				this._asyncQueue.enqueue(uri);
 			}
 		}
@@ -350,7 +372,9 @@ export class SymbolIndex {
 			if (uris.length === 0) {
 				return;
 			}
+
 			const t1 = performance.now();
+
 			await this._doUpdate(uris, true);
 
 			setTimeout(() => asyncUpdate(), (performance.now() - t1) * 4);
@@ -402,6 +426,7 @@ export class SymbolIndex {
 
 								if (isSameLanguage) {
 									result.unshift(info);
+
 									sameLanguageOffset++;
 								} else {
 									result.push(info);
@@ -412,6 +437,7 @@ export class SymbolIndex {
 						// update index
 						setTimeout(() => {
 							this._asyncQueue.dequeue(document.uri);
+
 							this._doIndex(document, symbols);
 						});
 					})
@@ -466,6 +492,7 @@ export class SymbolIndex {
 
 								if (isSameLanguage) {
 									result.unshift(location);
+
 									sameLanguageOffset++;
 								} else {
 									result.push(location);
@@ -476,6 +503,7 @@ export class SymbolIndex {
 						// update index
 						setTimeout(() => {
 							this._asyncQueue.dequeue(document.uri);
+
 							this._doIndex(document, undefined, usages);
 						});
 					})

@@ -32,11 +32,17 @@ export class TestDocumentStore extends DocumentStore {
 						});
 					}
 				}
+
 				onDidChangeTextDocument() {}
+
 				onDidCloseTextDocument() {}
+
 				onWillSaveTextDocument() {}
+
 				onWillSaveTextDocumentWaitUntil() {}
+
 				onDidSaveTextDocument() {}
+
 				onNotification() {}
 			})(),
 		);
@@ -81,6 +87,7 @@ export class Fixture {
 			if (!tree) {
 				throw new Error();
 			}
+
 			const query = Languages.getQuery(
 				tree.getLanguage(),
 				"comments",
@@ -112,7 +119,9 @@ export class Fixture {
 
 				for (
 					let row = capture.node.startPosition.row - 1;
+
 					row >= 0;
+
 					row--
 				) {
 					let node = tree.rootNode.descendantForPosition(
@@ -124,6 +133,7 @@ export class Fixture {
 						// skip stacked comments
 						continue;
 					}
+
 					marks.push(new FixtureMarks(node.startIndex, node.text));
 
 					break;

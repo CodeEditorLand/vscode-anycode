@@ -21,6 +21,7 @@ export class SelectionRangesProvider {
 		connection.client.register(lsp.SelectionRangeRequest.type, {
 			documentSelector: Languages.allAsSelector(),
 		});
+
 		connection.onRequest(
 			lsp.SelectionRangeRequest.type,
 			this.provideSelectionRanges.bind(this),
@@ -46,6 +47,7 @@ export class SelectionRangesProvider {
 			const offset = document.offsetAt(position);
 
 			let node = tree.rootNode;
+
 			stack.push(node);
 
 			while (true) {
@@ -58,10 +60,12 @@ export class SelectionRangesProvider {
 
 				if (child) {
 					stack.push(child);
+
 					node = child;
 
 					continue;
 				}
+
 				break;
 			}
 
@@ -69,8 +73,10 @@ export class SelectionRangesProvider {
 
 			for (let node of stack) {
 				let range = lsp.SelectionRange.create(asLspRange(node), parent);
+
 				parent = range;
 			}
+
 			if (parent) {
 				result.push(parent);
 			}

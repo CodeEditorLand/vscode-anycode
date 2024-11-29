@@ -32,14 +32,19 @@ export function encodeBase64(
 		const c = buffer[i + 2];
 
 		output += dictionary[a >>> 2];
+
 		output += dictionary[((a << 4) | (b >>> 4)) & 0b111111];
+
 		output += dictionary[((b << 2) | (c >>> 6)) & 0b111111];
+
 		output += dictionary[c & 0b111111];
 	}
 
 	if (remainder === 1) {
 		const a = buffer[i + 0];
+
 		output += dictionary[a >>> 2];
+
 		output += dictionary[(a << 4) & 0b111111];
 
 		if (padded) {
@@ -49,8 +54,11 @@ export function encodeBase64(
 		const a = buffer[i + 0];
 
 		const b = buffer[i + 1];
+
 		output += dictionary[a >>> 2];
+
 		output += dictionary[((a << 4) | (b >>> 4)) & 0b111111];
+
 		output += dictionary[(b << 2) & 0b111111];
 
 		if (padded) {
@@ -77,26 +85,32 @@ export function decodeBase64(encoded: string) {
 		switch (remainder) {
 			case 3:
 				buffer[bufi++] = building | value;
+
 				remainder = 0;
 
 				break;
 
 			case 2:
 				buffer[bufi++] = building | (value >>> 2);
+
 				building = value << 6;
+
 				remainder = 3;
 
 				break;
 
 			case 1:
 				buffer[bufi++] = building | (value >>> 4);
+
 				building = value << 4;
+
 				remainder = 2;
 
 				break;
 
 			default:
 				building = value << 2;
+
 				remainder = 1;
 		}
 	};

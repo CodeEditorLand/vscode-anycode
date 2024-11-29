@@ -60,14 +60,18 @@ export class Validation {
 
 		// cancel pending validation
 		let cts = this._currentValidation.get(document);
+
 		cts?.cancel();
+
 		cts?.dispose();
 
 		// schedule new validation
 		cts = new CancellationTokenSource();
+
 		this._currentValidation.set(document, cts);
 
 		const handle = setTimeout(() => this._createDiagnostics(document), 500);
+
 		cts.token.onCancellationRequested(() => clearTimeout(handle));
 	}
 
@@ -94,6 +98,7 @@ export class Validation {
 							source: "anycode",
 							code: "missing",
 						});
+
 						seen.add(cursor.nodeId);
 					}
 
@@ -103,6 +108,7 @@ export class Validation {
 							visitedChildren = true;
 						}
 					}
+
 					if (visitedChildren) {
 						if (cursor.gotoNextSibling()) {
 							visitedChildren = false;

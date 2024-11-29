@@ -21,6 +21,7 @@ export interface LanguageClientFactory {
 		name: string,
 		clientOptions: LanguageClientOptions,
 	): CommonLanguageClient;
+
 	destoryLanguageClient(client: CommonLanguageClient): void;
 }
 
@@ -50,6 +51,7 @@ export async function startClient(
 	context.subscriptions.push(reporter, telemetry);
 
 	let serverHandles: Promise<vscode.Disposable>[] = [];
+
 	startServer();
 
 	function startServer() {
@@ -66,6 +68,7 @@ export async function startClient(
 
 	async function stopServers() {
 		const oldHandles = serverHandles.slice(0);
+
 		serverHandles = [];
 
 		const result = await Promise.allSettled(oldHandles);
@@ -78,12 +81,16 @@ export async function startClient(
 	}
 
 	context.subscriptions.push(channel);
+
 	context.subscriptions.push(_statusItem);
+
 	context.subscriptions.push(supportedLanguages);
+
 	context.subscriptions.push(
 		supportedLanguages.onDidChange(async () => {
 			// restart server when supported languages change
 			await stopServers();
+
 			startServer();
 		}),
 	);
@@ -97,7 +104,9 @@ function _updateStatusAndInfo(
 	showCommandHint: boolean,
 ): void {
 	_statusItem.selector = selector;
+
 	_statusItem.severity = vscode.LanguageStatusSeverity.Warning;
+
 	_statusItem.text = `Partial Mode`;
 
 	if (showCommandHint) {
@@ -107,6 +116,7 @@ function _updateStatusAndInfo(
 		_statusItem.detail =
 			"Language support is inaccurate in this context, results may be imprecise and incomplete.";
 	}
+
 	_statusItem.command = {
 		title: "Learn More",
 		command: "vscode.open",
@@ -149,6 +159,7 @@ async function _startServer(
 		"dbName",
 		`anycode_${Math.random().toString(32).slice(2)}`,
 	);
+
 	context.workspaceState.update("dbName", databaseName);
 
 	// Build a glob-patterns for languages which have features enabled, like workspace symbol search,
@@ -164,9 +175,11 @@ async function _startServer(
 			findAndSearchSuffixes.push(lang.info.suffixes);
 		}
 	}
+
 	const langPattern = `**/*.{${findAndSearchSuffixes.join(",")}}`;
 
 	const watcher = vscode.workspace.createFileSystemWatcher(langPattern);
+
 	disposables.push(watcher);
 
 	const treeSitterWasmUri = vscode.Uri.joinPath(
@@ -232,6 +245,7 @@ async function _startServer(
 	);
 
 	disposables.push(client.start());
+
 	disposables.push(
 		new vscode.Disposable(() => factory.destoryLanguageClient(client)),
 	);
@@ -274,16 +288,19 @@ async function _startServer(
 					// for remotehub this means try to fetch the repo-tar first
 					if (await _canInitWithoutLimits()) {
 						size = Number.MAX_SAFE_INTEGER;
+
 						hasWorkspaceContents = 1;
 					}
 				}
 
 				const uris = all.slice(0, size);
+
 				log.appendLine(
 					`[INDEX] using ${uris.length} of ${all.length} files for ${langPattern}`,
 				);
 
 				const t1 = performance.now();
+
 				await client.sendRequest(
 					CustomMessages.QueueInit,
 					uris.map(String),
@@ -311,12 +328,14 @@ async function _startServer(
 				for (const [lang] of supportedLanguages) {
 					suffixesByLangId.set(lang.info.languageId, lang);
 				}
+
 				const handleTextDocument = async (doc: vscode.TextDocument) => {
 					const lang = suffixesByLangId.get(doc.languageId);
 
 					if (!lang) {
 						return;
 					}
+
 					suffixesByLangId.delete(doc.languageId);
 
 					const langData = await lang.fetchLanguageData();
@@ -329,6 +348,7 @@ async function _startServer(
 					const initCancel = new Promise<void>((resolve) =>
 						disposables.push(new vscode.Disposable(resolve)),
 					);
+
 					vscode.window.withProgress(
 						{
 							location: vscode.ProgressLocation.Window,
@@ -344,7 +364,9 @@ async function _startServer(
 
 				const listener =
 					vscode.workspace.onDidOpenTextDocument(handleTextDocument);
+
 				disposables.push(listener);
+
 				vscode.workspace.textDocuments.forEach(handleTextDocument);
 
 				// show status/maybe notifications
@@ -391,10 +413,12 @@ async function _startServer(
 					console.warn(
 						`IGNORING "${uri.toString()}" because it is too large (${stat.size}bytes)`,
 					);
+
 					data = [];
 				} else {
 					data = Array.from(await vscode.workspace.fs.readFile(uri));
 				}
+
 				return data;
 			} catch (err) {
 				// graceful
@@ -434,6 +458,7 @@ function _isRemoteHubWorkspace() {
 	if (!_getRemoteHubExtension()) {
 		return false;
 	}
+
 	return (
 		vscode.workspace.workspaceFolders?.every(
 			(folder) => folder.uri.scheme === "vscode-vfs",

@@ -35,6 +35,7 @@ import * as queries from "./queries.test";
 
 		for (let info of langInfo) {
 			config.push([info, {}]);
+
 			queries.init(info);
 		}
 
@@ -46,6 +47,7 @@ import * as queries from "./queries.test";
 			const base64 = encodeBase64(
 				new Uint8Array(await data.arrayBuffer()),
 			);
+
 			Languages.setLanguageData(
 				info.languageId,
 				new LanguageData(base64, info.queryInfo),
@@ -56,6 +58,7 @@ import * as queries from "./queries.test";
 
 		if (outline) {
 			const langId = Languages.getLanguageIdByUri(outline);
+
 			await documentSymbols.init(outline, langId);
 		}
 
@@ -63,6 +66,7 @@ import * as queries from "./queries.test";
 
 		if (highlights) {
 			const langId = Languages.getLanguageIdByUri(highlights);
+
 			await documentHighlights.init(highlights, langId);
 		}
 
@@ -70,6 +74,7 @@ import * as queries from "./queries.test";
 	} catch (err) {
 		// @ts-expect-error
 		window.report_mocha_done(err);
+
 		console.error(err);
 	}
 })();

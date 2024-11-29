@@ -11,6 +11,7 @@ import { FileSymbolStorage } from "./storage";
 
 process.on("unhandledRejection", (e: any) => {
 	connection.console.error(`Unhandled exception`);
+
 	connection.console.error(e);
 });
 

@@ -30,6 +30,7 @@ export class Trees {
 	});
 
 	private readonly _listener: Disposable[] = [];
+
 	private readonly _parser = new Parser();
 
 	constructor(private readonly _documents: DocumentStore) {
@@ -51,6 +52,7 @@ export class Trees {
 		for (let item of this._cache.values()) {
 			item.tree.delete();
 		}
+
 		for (let item of this._listener) {
 			item.dispose();
 		}
@@ -64,11 +66,13 @@ export class Trees {
 		if (typeof documentOrUri === "string") {
 			documentOrUri = await this._documents.retrieve(documentOrUri);
 		}
+
 		const language = await Languages.getLanguage(documentOrUri.languageId);
 
 		if (!language) {
 			return undefined;
 		}
+
 		return this._parse(documentOrUri, language);
 	}
 
@@ -83,6 +87,7 @@ export class Trees {
 		}
 
 		this._parser.setLanguage(language);
+
 		this._parser.setTimeoutMicros(1000 * 1000); // parse max 1sec
 
 		try {
@@ -93,18 +98,24 @@ export class Trees {
 			if (!info) {
 				// never seen before, parse fresh
 				const tree = this._parser.parse(text);
+
 				info = new Entry(version, tree, []);
+
 				this._cache.set(documentOrUri.uri, info);
 			} else {
 				// existing entry, apply deltas and parse incremental
 				const oldTree = info.tree;
 
 				const deltas = info.edits.flat();
+
 				deltas.forEach((delta) => oldTree.edit(delta));
+
 				info.edits.length = 0;
 
 				info.tree = this._parser.parse(text, oldTree);
+
 				info.version = version;
+
 				oldTree.delete();
 			}
 

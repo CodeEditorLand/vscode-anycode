@@ -24,6 +24,7 @@ export class DocumentSymbols {
 				"outline",
 			]),
 		});
+
 		connection.onRequest(
 			lsp.DocumentSymbolRequest.type,
 			this.provideDocumentSymbols.bind(this),
@@ -48,6 +49,7 @@ export async function getDocumentSymbols(
 ): Promise<lsp.DocumentSymbol[]> {
 	class Node {
 		readonly range: lsp.Range;
+
 		readonly children: Node[] = [];
 
 		constructor(readonly capture: QueryCapture) {
@@ -60,6 +62,7 @@ export async function getDocumentSymbols(
 	if (!tree) {
 		return [];
 	}
+
 	const query = Languages.getQuery(tree.getLanguage(), "outline");
 
 	const captures = query.captures(tree.rootNode);
@@ -78,17 +81,22 @@ export async function getDocumentSymbols(
 		while (true) {
 			if (!parent) {
 				roots.push(node);
+
 				stack.push(node);
 
 				break;
 			}
+
 			if (containsRange(parent.range, node.range)) {
 				parent.children.push(node);
+
 				stack.push(parent);
+
 				stack.push(node);
 
 				break;
 			}
+
 			parent = stack.pop();
 		}
 	}
@@ -112,9 +120,11 @@ export async function getDocumentSymbols(
 				build(child, children);
 			}
 		}
+
 		if (!nameNode) {
 			nameNode = node;
 		}
+
 		const symbol = lsp.DocumentSymbol.create(
 			nameNode.capture.node.text,
 			"",
@@ -122,6 +132,7 @@ export async function getDocumentSymbols(
 			node.range,
 			nameNode.range,
 		);
+
 		symbol.children = children;
 
 		bucket.push(symbol);

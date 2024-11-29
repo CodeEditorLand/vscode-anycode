@@ -26,6 +26,7 @@ const factory: IStorageFactory = {
 	async create(name) {
 		try {
 			const result = new IndexedDBSymbolStorage(name);
+
 			await result.open();
 
 			return result;

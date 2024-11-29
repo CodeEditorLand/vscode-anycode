@@ -58,6 +58,7 @@ export const symbolMapping: SymbolMapping = new (class {
 		if (!res && strict) {
 			return undefined;
 		}
+
 		return res ?? lsp.SymbolKind.Variable;
 	}
 })();
@@ -89,11 +90,13 @@ export function identifierAtPosition(
 
 	// `foo|::bar` -> finds `foo`
 	candidate = nodeAtPosition(node, position, true);
+
 	capture = identQuery.captures(candidate);
 
 	if (capture.length === 1) {
 		return candidate;
 	}
+
 	return undefined;
 }
 
@@ -109,11 +112,13 @@ export function nodeAtPosition(
 			if (isBefore(position, range.end)) {
 				return nodeAtPosition(child, position, leftBias);
 			}
+
 			if (leftBias && isBeforeOrEqual(position, range.end)) {
 				return nodeAtPosition(child, position, leftBias);
 			}
 		}
 	}
+
 	return node;
 }
 
@@ -121,9 +126,11 @@ export function isBeforeOrEqual(a: lsp.Position, b: lsp.Position): boolean {
 	if (a.line < b.line) {
 		return true;
 	}
+
 	if (b.line < a.line) {
 		return false;
 	}
+
 	return a.character <= b.character;
 }
 
@@ -131,9 +138,11 @@ export function isBefore(a: lsp.Position, b: lsp.Position): boolean {
 	if (a.line < b.line) {
 		return true;
 	}
+
 	if (b.line < a.line) {
 		return false;
 	}
+
 	return a.character < b.character;
 }
 
@@ -149,6 +158,7 @@ export function compareRangeByStart(a: lsp.Range, b: lsp.Range): number {
 	} else if (isBefore(b.end, a.end)) {
 		return 1;
 	}
+
 	return 0;
 }
 
@@ -190,6 +200,7 @@ export class StopWatch {
 	reset() {
 		this.t1 = performance.now();
 	}
+
 	elapsed() {
 		return (performance.now() - this.t1).toFixed(2);
 	}
@@ -213,16 +224,21 @@ export async function parallel<R>(
 		if (token.isCancellationRequested) {
 			throw new Error("cancelled");
 		}
+
 		const partTasks = tasks.slice(pos, pos + degree);
 
 		if (partTasks.length === 0) {
 			break;
 		}
+
 		const partResult = await Promise.all(
 			partTasks.map((task) => task(token)),
 		);
+
 		pos += degree;
+
 		result.push(...partResult);
 	}
+
 	return result;
 }

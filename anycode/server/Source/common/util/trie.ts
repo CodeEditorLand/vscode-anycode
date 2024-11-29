@@ -14,6 +14,7 @@ export interface ReadonlyTrie<E> {
 	size: number;
 
 	get(str: string): E | undefined;
+
 	query(str: string[]): IterableIterator<[string, E]>;
 	[Symbol.iterator](): IterableIterator<[string, E]>;
 }
@@ -24,7 +25,9 @@ export class Trie<E> implements ReadonlyTrie<E> {
 	}
 
 	private _size: number = 0;
+
 	private _depth: number = 0;
+
 	private readonly _children = new Map<string, Trie<E>>();
 
 	private constructor(
@@ -54,12 +57,16 @@ export class Trie<E> implements ReadonlyTrie<E> {
 
 			if (!child) {
 				child = new Trie<E>(ch, undefined);
+
 				node._children.set(ch, child);
 			}
+
 			node = child;
 		}
+
 		if (!node.element) {
 			this._size += 1;
+
 			node.element = new Entry(str, element);
 		} else {
 			node.element.value = element;
@@ -79,8 +86,10 @@ export class Trie<E> implements ReadonlyTrie<E> {
 			if (!child) {
 				return undefined;
 			}
+
 			node = child;
 		}
+
 		return node.element?.value;
 	}
 
@@ -99,7 +108,9 @@ export class Trie<E> implements ReadonlyTrie<E> {
 			if (!child) {
 				return false;
 			}
+
 			path.push([ch, node]);
+
 			node = child;
 		}
 
@@ -109,6 +120,7 @@ export class Trie<E> implements ReadonlyTrie<E> {
 
 		// unset element
 		node.element = undefined;
+
 		this._size -= 1;
 
 		// cleanup parents and update depths
@@ -119,6 +131,7 @@ export class Trie<E> implements ReadonlyTrie<E> {
 			if (node._children.size === 0 && !node.element) {
 				parent._children.delete(nodeCh);
 			}
+
 			node = parent;
 
 			if (node._children.size === 0) {
@@ -129,6 +142,7 @@ export class Trie<E> implements ReadonlyTrie<E> {
 				for (let child of node._children.values()) {
 					newDepth = Math.max(newDepth, child.depth);
 				}
+
 				node._depth = 1 + newDepth;
 			}
 		}
@@ -186,6 +200,7 @@ export class Trie<E> implements ReadonlyTrie<E> {
 					// consume query character if
 					_query(child, str, pos + 1, skipped, ch);
 				}
+
 				_query(child, str, pos, skipped + 1, ch);
 			}
 		};
@@ -206,6 +221,7 @@ export class Trie<E> implements ReadonlyTrie<E> {
 			if (node.element) {
 				yield [node.element.key, node.element.value];
 			}
+
 			for (let child of node._children.values()) {
 				stack.push(child);
 			}

@@ -22,6 +22,7 @@ export class FoldingRangeProvider {
 				"folding",
 			]),
 		});
+
 		connection.onRequest(
 			lsp.FoldingRangeRequest.type,
 			this.provideFoldingRanges.bind(this),
@@ -60,6 +61,7 @@ export class FoldingRangeProvider {
 				),
 			);
 		}
+
 		return result;
 	}
 }

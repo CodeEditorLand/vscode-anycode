@@ -5,10 +5,15 @@
 
 export interface Queries {
 	readonly comments?: string;
+
 	readonly folding?: string;
+
 	readonly identifiers?: string;
+
 	readonly locals?: string;
+
 	readonly outline?: string;
+
 	readonly references?: string;
 }
 
@@ -46,12 +51,19 @@ export class LanguageData {
 
 export interface FeatureConfig {
 	completions?: boolean;
+
 	definitions?: boolean;
+
 	references?: boolean;
+
 	highlights?: boolean;
+
 	outline?: boolean;
+
 	folding?: boolean;
+
 	workspaceSymbols?: boolean;
+
 	diagnostics?: boolean;
 }
 
@@ -59,6 +71,8 @@ export type LanguageConfiguration = [LanguageInfo, FeatureConfig][];
 
 export type InitOptions = {
 	treeSitterWasmUri: string;
+
 	supportedLanguages: LanguageConfiguration;
+
 	databaseName: string;
 };

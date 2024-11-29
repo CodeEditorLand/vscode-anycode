@@ -26,6 +26,7 @@ export class DefinitionProvider {
 				"outline",
 			]),
 		});
+
 		connection.onRequest(
 			lsp.DefinitionRequest.type,
 			this.provideDefinitions.bind(this),

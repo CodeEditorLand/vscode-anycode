@@ -48,6 +48,7 @@ export class Locals {
 			const capture = scopeCaptures[i];
 
 			const range = asLspRange(capture.node);
+
 			all.push(new Scope(range, capture.name.endsWith(".exports")));
 		}
 
@@ -103,10 +104,12 @@ export class Locals {
 					}
 
 					stack.push(parent);
+
 					stack.push(thing);
 
 					break;
 				}
+
 				if (parent === root) {
 					// impossible ?!
 					break;
@@ -116,6 +119,7 @@ export class Locals {
 
 		// remove helper usage-nodes
 		stack.length = 0;
+
 		stack.push(root);
 
 		while (stack.length > 0) {
@@ -155,6 +159,7 @@ const enum NodeType {
 
 abstract class Node {
 	protected _parent: Node | undefined;
+
 	protected _children: Node[] = [];
 
 	constructor(
@@ -170,11 +175,13 @@ abstract class Node {
 		if (!this._parent) {
 			return false;
 		}
+
 		const idx = this._parent._children.indexOf(this);
 
 		if (idx < 0) {
 			return false;
 		}
+
 		this._parent._children.splice(idx, 1);
 
 		return true;
@@ -182,6 +189,7 @@ abstract class Node {
 
 	appendChild(node: Node) {
 		this._children.push(node);
+
 		node._parent = this;
 	}
 
@@ -239,6 +247,7 @@ export class Scope extends Node {
 
 	constructor(range: lsp.Range, likelyExports: boolean) {
 		super(range, NodeType.Scope);
+
 		this.likelyExports = likelyExports;
 	}
 
@@ -270,6 +279,7 @@ export class Scope extends Node {
 				return scope._findScope(position);
 			}
 		}
+
 		return this;
 	}
 
@@ -287,6 +297,7 @@ export class Scope extends Node {
 					return child;
 				}
 			}
+
 			if (scope._parent instanceof Scope) {
 				scope = scope._parent;
 			} else {
@@ -303,12 +314,15 @@ export class Scope extends Node {
 				result.push(child);
 			}
 		}
+
 		if (result.length > 0) {
 			return result;
 		}
+
 		if (!(this._parent instanceof Scope)) {
 			return [];
 		}
+
 		return this._parent.findDefinitions(text);
 	}
 
@@ -340,6 +354,7 @@ export class Scope extends Node {
 				result.push(child);
 			}
 		}
+
 		bucket.push(result);
 
 		// usages in child scope (unless also defined there)
@@ -356,6 +371,7 @@ export class Scope extends Node {
 				return true;
 			}
 		}
+
 		return false;
 	}
 
@@ -375,7 +391,9 @@ export class Scope extends Node {
 		let indent = " ".repeat(depth);
 
 		let res = `${indent}Scope@${this.range.start.line},${this.range.start.character}-${this.range.end.line},${this.range.end.character}`;
+
 		res += `\n${indent + indent}${parts.join(`, `)}`;
+
 		res += `\n${indent}${scopes.join(`\n${indent}`)}`;
 
 		return res;

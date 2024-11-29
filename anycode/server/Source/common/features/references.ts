@@ -28,6 +28,7 @@ export class ReferencesProvider {
 				"references",
 			]),
 		});
+
 		connection.onRequest(
 			lsp.ReferencesRequest.type,
 			this.provideReferences.bind(this),
@@ -59,11 +60,13 @@ export class ReferencesProvider {
 						);
 					}
 				}
+
 				const usages = anchor.scope.findUsages(anchor.name);
 
 				for (let usage of usages) {
 					result.push(lsp.Location.create(document.uri, usage.range));
 				}
+
 				return result;
 			}
 		}
@@ -111,6 +114,7 @@ export class ReferencesProvider {
 		for (let usage of usages) {
 			seenAsUsage =
 				seenAsUsage || containsPosition(usage.range, position);
+
 			result.push(usage);
 		}
 
@@ -135,7 +139,9 @@ export class ReferencesProvider {
 
 export interface IUsage {
 	name: string;
+
 	range: lsp.Range;
+
 	kind: lsp.SymbolKind;
 }
 
@@ -159,6 +165,7 @@ export async function getDocumentUsages(
 		const name = capture.node.text;
 
 		const range = asLspRange(capture.node);
+
 		result.push({
 			name,
 			range,

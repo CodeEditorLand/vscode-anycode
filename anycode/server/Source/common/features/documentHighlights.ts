@@ -25,6 +25,7 @@ export class DocumentHighlightsProvider {
 				"identifiers",
 			]),
 		});
+
 		connection.onRequest(
 			lsp.DocumentHighlightRequest.type,
 			this.provideDocumentHighlights.bind(this),
@@ -45,6 +46,7 @@ export class DocumentHighlightsProvider {
 		if (!anchor) {
 			return this._identifierBasedHighlights(document, params.position);
 		}
+
 		const result: lsp.DocumentHighlight[] = [];
 
 		for (let def of anchor.scope.findDefinitions(anchor.name)) {
@@ -55,10 +57,12 @@ export class DocumentHighlightsProvider {
 				),
 			);
 		}
+
 		if (result.length === 0) {
 			// needs a definition
 			return this._identifierBasedHighlights(document, params.position);
 		}
+
 		for (let usage of anchor.scope.findUsages(anchor.name)) {
 			result.push(
 				lsp.DocumentHighlight.create(
@@ -67,6 +71,7 @@ export class DocumentHighlightsProvider {
 				),
 			);
 		}
+
 		return result;
 	}
 

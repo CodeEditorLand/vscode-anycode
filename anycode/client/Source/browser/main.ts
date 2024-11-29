@@ -29,15 +29,18 @@ export async function activate(context: vscode.ExtensionContext) {
 			const worker = new Worker(serverMain.toString());
 
 			const result = new LanguageClient(id, name, clientOptions, worker);
+
 			this._map.set(result, worker);
 
 			return result;
 		}
+
 		destoryLanguageClient(client: CommonLanguageClient): void {
 			const worker = this._map.get(client);
 
 			if (worker) {
 				worker.terminate();
+
 				this._map.delete(client);
 			}
 		}

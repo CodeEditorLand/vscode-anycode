@@ -34,13 +34,16 @@ import { Trees } from "./trees";
 
 export interface IStorageFactory {
 	create(name: string): Promise<SymbolInfoStorage>;
+
 	destroy(index: SymbolInfoStorage): Promise<void>;
 }
 
 export function startServer(connection: Connection, factory: IStorageFactory) {
 	// patch console.log/warn/error calls
 	console.log = connection.console.log.bind(connection.console);
+
 	console.warn = connection.console.warn.bind(connection.console);
+
 	console.error = connection.console.error.bind(connection.console);
 
 	const features: { register(connection: Connection): any }[] = [];
@@ -62,11 +65,14 @@ export function startServer(connection: Connection, factory: IStorageFactory) {
 				await Parser.init(options);
 			} catch (e) {
 				console.error("FAILED to initialize tree-sitter");
+
 				console.error(typeof e);
+
 				console.error(e);
 
 				throw e;
 			}
+
 			Languages.init(initData.supportedLanguages);
 
 			// setup features
@@ -76,6 +82,7 @@ export function startServer(connection: Connection, factory: IStorageFactory) {
 
 			// caching
 			const symbolStorage = await factory.create(initData.databaseName);
+
 			connection.onExit(() => factory.destroy(symbolStorage));
 
 			const symbolIndex = new SymbolIndex(
@@ -85,19 +92,27 @@ export function startServer(connection: Connection, factory: IStorageFactory) {
 			);
 
 			features.push(new WorkspaceSymbol(documents, trees, symbolIndex));
+
 			features.push(
 				new DefinitionProvider(documents, trees, symbolIndex),
 			);
+
 			features.push(
 				new ReferencesProvider(documents, trees, symbolIndex),
 			);
+
 			features.push(
 				new CompletionItemProvider(documents, trees, symbolIndex),
 			);
+
 			features.push(new DocumentHighlightsProvider(documents, trees));
+
 			features.push(new DocumentSymbols(documents, trees));
+
 			features.push(new SelectionRangesProvider(documents, trees));
+
 			features.push(new FoldingRangeProvider(documents, trees));
+
 			new Validation(connection, documents, trees);
 
 			// manage symbol index. add/remove files as they are disovered and edited
@@ -119,10 +134,13 @@ export function startServer(connection: Connection, factory: IStorageFactory) {
 				CustomMessages.QueueUnleash,
 				async (arg: [LanguageInfo, LanguageData]) => {
 					const [info, data] = arg;
+
 					console.log(
 						`[index] unleashed files matching: ${info.languageId}`,
 					);
+
 					Languages.setLanguageData(info.languageId, data);
+
 					symbolIndex.unleashFiles(info.suffixes);
 				},
 			);

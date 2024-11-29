@@ -65,6 +65,7 @@ export async function activate(context: vscode.ExtensionContext) {
 						if (!persistUri) {
 							return "";
 						}
+
 						try {
 							const data =
 								await vscode.workspace.fs.readFile(persistUri);
@@ -75,9 +76,11 @@ export async function activate(context: vscode.ExtensionContext) {
 						}
 					},
 				);
+
 				client.onRequest("persisted/write", async (json: string) => {
 					if (persistUri) {
 						const data = encoder.encode(json);
+
 						await vscode.workspace.fs.writeFile(
 							persistUri,
 							new Uint8Array(data),
@@ -88,6 +91,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
 			return client;
 		}
+
 		destoryLanguageClient(client: CommonLanguageClient): void {
 			if (client instanceof LanguageClient) {
 				client.stop();

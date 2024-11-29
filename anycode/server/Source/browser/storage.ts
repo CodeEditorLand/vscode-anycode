@@ -9,7 +9,9 @@ import { SymbolInfo, SymbolInfoStorage } from "../common/features/symbolIndex";
 
 export class IndexedDBSymbolStorage implements SymbolInfoStorage {
 	private readonly _version = 1;
+
 	private readonly _store = "fileSymbols";
+
 	private _db?: IDBDatabase;
 
 	constructor(private readonly _name: string) {}
@@ -21,7 +23,9 @@ export class IndexedDBSymbolStorage implements SymbolInfoStorage {
 
 		await new Promise((resolve, reject) => {
 			const request = indexedDB.open(this._name, this._version);
+
 			request.onerror = () => reject(request.error);
+
 			request.onsuccess = () => {
 				const db = request.result;
 
@@ -33,15 +37,18 @@ export class IndexedDBSymbolStorage implements SymbolInfoStorage {
 					return resolve(this._delete(db).then(() => this.open()));
 				} else {
 					resolve(undefined);
+
 					this._db = db;
 				}
 			};
+
 			request.onupgradeneeded = () => {
 				const db = request.result;
 
 				if (db.objectStoreNames.contains(this._store)) {
 					db.deleteObjectStore(this._store);
 				}
+
 				db.createObjectStore(this._store);
 			};
 		});
@@ -50,6 +57,7 @@ export class IndexedDBSymbolStorage implements SymbolInfoStorage {
 	async close(): Promise<void> {
 		if (this._db) {
 			await this._bulkInsert();
+
 			this._db.close();
 		}
 	}
@@ -61,12 +69,15 @@ export class IndexedDBSymbolStorage implements SymbolInfoStorage {
 
 			// Delete the db
 			const deleteRequest = indexedDB.deleteDatabase(this._name);
+
 			deleteRequest.onerror = () => reject(deleteRequest.error);
+
 			deleteRequest.onsuccess = () => resolve();
 		});
 	}
 
 	private _insertQueue = new Map<string, Array<string | number>>();
+
 	private _insertHandle: number | undefined | any;
 
 	insert(uri: string, info: Map<string, SymbolInfo>) {
@@ -74,13 +85,18 @@ export class IndexedDBSymbolStorage implements SymbolInfoStorage {
 
 		for (let [word, i] of info) {
 			flatInfo.push(word);
+
 			flatInfo.push(i.definitions.size);
+
 			flatInfo.push(...i.definitions);
+
 			flatInfo.push(...i.usages);
 		}
 
 		this._insertQueue.set(uri, flatInfo);
+
 		clearTimeout(this._insertHandle);
+
 		this._insertHandle = setTimeout(() => {
 			this._bulkInsert().catch((err) => {
 				console.error(err);
@@ -92,19 +108,24 @@ export class IndexedDBSymbolStorage implements SymbolInfoStorage {
 		if (this._insertQueue.size === 0) {
 			return;
 		}
+
 		return new Promise((resolve, reject) => {
 			if (!this._db) {
 				return reject(new Error("invalid state"));
 			}
+
 			const t = this._db.transaction(this._store, "readwrite");
 
 			const toInsert = new Map(this._insertQueue);
+
 			this._insertQueue.clear();
 
 			for (let [uri, data] of toInsert) {
 				t.objectStore(this._store).put(data, uri);
 			}
+
 			t.oncomplete = () => resolve(undefined);
+
 			t.onerror = (err) => reject(err);
 		});
 	}
@@ -114,6 +135,7 @@ export class IndexedDBSymbolStorage implements SymbolInfoStorage {
 			if (!this._db) {
 				return reject(new Error("invalid state"));
 			}
+
 			const entries = new Map<string, Map<string, SymbolInfo>>();
 
 			const t = this._db.transaction(this._store, "readonly");
@@ -121,12 +143,14 @@ export class IndexedDBSymbolStorage implements SymbolInfoStorage {
 			const store = t.objectStore(this._store);
 
 			const cursor = store.openCursor();
+
 			cursor.onsuccess = () => {
 				if (!cursor.result) {
 					resolve(entries);
 
 					return;
 				}
+
 				const info = new Map<string, SymbolInfo>();
 
 				const flatInfo = <Array<string | number>>cursor.result.value;
@@ -140,7 +164,9 @@ export class IndexedDBSymbolStorage implements SymbolInfoStorage {
 
 					for (
 						;
+
 						i < flatInfo.length && typeof flatInfo[i] === "number";
+
 						i++
 					) {}
 
@@ -157,10 +183,12 @@ export class IndexedDBSymbolStorage implements SymbolInfoStorage {
 				}
 
 				entries.set(String(cursor.result.key), info);
+
 				cursor.result.continue();
 			};
 
 			cursor.onerror = () => reject(cursor.error);
+
 			t.onerror = () => reject(t.error);
 		});
 	}
@@ -170,15 +198,19 @@ export class IndexedDBSymbolStorage implements SymbolInfoStorage {
 			if (!this._db) {
 				return reject(new Error("invalid state"));
 			}
+
 			const t = this._db.transaction(this._store, "readwrite");
 
 			const store = t.objectStore(this._store);
 
 			for (const uri of uris) {
 				const request = store.delete(uri);
+
 				request.onerror = (e) => console.error(e);
 			}
+
 			t.oncomplete = () => resolve(undefined);
+
 			t.onerror = (err) => reject(err);
 		});
 	}

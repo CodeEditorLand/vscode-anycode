@@ -17,11 +17,16 @@ export class FileSymbolStorage implements SymbolInfoStorage {
 
 		for (let [word, i] of info) {
 			flatInfo.push(word);
+
 			flatInfo.push(i.definitions.size);
+
 			flatInfo.push(...i.definitions);
+
 			flatInfo.push(...i.usages);
 		}
+
 		this._data.set(uri, flatInfo);
+
 		this._saveSoon();
 	}
 
@@ -29,6 +34,7 @@ export class FileSymbolStorage implements SymbolInfoStorage {
 		for (const uri of uris) {
 			this._data.delete(uri);
 		}
+
 		this._saveSoon();
 	}
 
@@ -36,6 +42,7 @@ export class FileSymbolStorage implements SymbolInfoStorage {
 
 	private _saveSoon() {
 		clearTimeout(this._saveTimer);
+
 		this._saveTimer = setTimeout(() => {
 			this.flush();
 		}, 50);
@@ -43,6 +50,7 @@ export class FileSymbolStorage implements SymbolInfoStorage {
 
 	flush() {
 		const raw = JSON.stringify(Array.from(this._data.entries()));
+
 		this._connection
 			.sendRequest("persisted/write", raw)
 			.catch((err) => console.error(err));
@@ -63,6 +71,7 @@ export class FileSymbolStorage implements SymbolInfoStorage {
 				this._data.set(uri, flatInfo);
 
 				const info = new Map<string, SymbolInfo>();
+
 				result.set(uri, info);
 
 				for (let i = 0; i < flatInfo.length; ) {
@@ -74,7 +83,9 @@ export class FileSymbolStorage implements SymbolInfoStorage {
 
 					for (
 						;
+
 						i < flatInfo.length && typeof flatInfo[i] === "number";
+
 						i++
 					) {}
 
@@ -93,6 +104,7 @@ export class FileSymbolStorage implements SymbolInfoStorage {
 		} catch (err) {
 			console.error(err);
 		}
+
 		return result;
 	}
 }

@@ -14,10 +14,15 @@ import {
 
 export type QueryModule = {
 	outline?: string;
+
 	comments?: string;
+
 	folding?: string;
+
 	locals?: string;
+
 	identifiers?: string;
+
 	references?: string;
 };
 
@@ -27,6 +32,7 @@ const _queryModules = new Map<string, QueryModule>();
 
 interface LanguageFuture {
 	promise: Promise<Parser.Language | undefined>;
+
 	resolve(language: Promise<Parser.Language>): void;
 }
 
@@ -35,6 +41,7 @@ export default abstract class Languages {
 		string,
 		LanguageFuture
 	>();
+
 	private static readonly _languageIdByLanguage = new Map<
 		Parser.Language,
 		string
@@ -43,6 +50,7 @@ export default abstract class Languages {
 	private static readonly _queryInstances = new Map<string, Parser.Query>();
 
 	private static readonly _configurations = new Map<string, FeatureConfig>();
+
 	private static _langConfiguration: LanguageConfiguration;
 
 	static init(langConfiguration: LanguageConfiguration): void {
@@ -66,6 +74,7 @@ export default abstract class Languages {
 							console.error(
 								`FAILED to load grammar for language ${entry.languageId}`,
 							);
+
 							console.error(err);
 						}
 
@@ -74,14 +83,17 @@ export default abstract class Languages {
 								language,
 								entry.languageId,
 							);
+
 							_resolve(language);
 						} else {
 							this._languageInstances.delete(entry.languageId);
+
 							_resolve(undefined);
 						}
 					};
 				},
 			);
+
 			this._languageInstances.set(entry.languageId, { promise, resolve });
 		}
 	}
@@ -89,6 +101,7 @@ export default abstract class Languages {
 	static setLanguageData(languageId: string, data: LanguageData) {
 		// set language instance
 		const future = this._languageInstances.get(languageId);
+
 		future?.resolve(Parser.Language.load(decodeBase64(data.grammarBase64)));
 
 		// set queries
@@ -105,6 +118,7 @@ export default abstract class Languages {
 
 			return undefined;
 		}
+
 		return infoOrLanguage.promise;
 	}
 
@@ -137,15 +151,19 @@ export default abstract class Languages {
 				query = language.query(source);
 			} catch (e) {
 				query = language.query("");
+
 				console.error(languageId, e);
+
 				console.log(language);
 
 				if (strict) {
 					throw e;
 				}
 			}
+
 			this._queryInstances.set(key, query);
 		}
+
 		return query;
 	}
 
@@ -167,6 +185,7 @@ export default abstract class Languages {
 				}
 			}
 		}
+
 		return result;
 	}
 
@@ -176,9 +195,11 @@ export default abstract class Languages {
 		if (end < 0) {
 			end = uri.lastIndexOf("#");
 		}
+
 		if (end > 0) {
 			uri = uri.substring(0, end);
 		}
+
 		const start = uri.lastIndexOf(".");
 
 		const suffix = uri.substring(start + 1);
@@ -190,6 +211,7 @@ export default abstract class Languages {
 				}
 			}
 		}
+
 		return `unknown/${uri}`;
 	}
 }

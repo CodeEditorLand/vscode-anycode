@@ -21,10 +21,12 @@ export class WorkspaceSymbol {
 		connection.client.register(lsp.WorkspaceSymbolRequest.type, {
 			resolveProvider: true,
 		});
+
 		connection.onRequest(
 			lsp.WorkspaceSymbolRequest.type,
 			this.provideWorkspaceSymbols.bind(this),
 		);
+
 		connection.onRequest(
 			lsp.WorkspaceSymbolResolveRequest.type,
 			this.resolveWorkspaceSymbol.bind(this),
@@ -83,6 +85,7 @@ export class WorkspaceSymbol {
 				);
 			}
 		}
+
 		return item;
 	}
 }

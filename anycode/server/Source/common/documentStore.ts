@@ -13,10 +13,14 @@ import { LRUMap } from "./util/lruMap";
 
 export interface TextDocumentChange2 {
 	document: TextDocument;
+
 	changes: {
 		range: lsp.Range;
+
 		rangeOffset: number;
+
 		rangeLength: number;
+
 		text: string;
 	}[];
 }
@@ -24,9 +28,11 @@ export interface TextDocumentChange2 {
 export class DocumentStore extends TextDocuments<TextDocument> {
 	private readonly _onDidChangeContent2 =
 		new lsp.Emitter<TextDocumentChange2>();
+
 	readonly onDidChangeContent2 = this._onDidChangeContent2.event;
 
 	private readonly _decoder = new TextDecoder();
+
 	private readonly _fileDocuments: LRUMap<string, Promise<TextDocument>>;
 
 	constructor(private readonly _connection: lsp.Connection) {
@@ -49,7 +55,9 @@ export class DocumentStore extends TextDocuments<TextDocument> {
 
 						break;
 					}
+
 					const rangeOffset = doc.offsetAt(change.range.start);
+
 					event.changes.push({
 						text: change.text,
 						range: change.range,
@@ -59,11 +67,13 @@ export class DocumentStore extends TextDocuments<TextDocument> {
 							doc.offsetAt(change.range.end) - rangeOffset,
 					});
 				}
+
 				result = TextDocument.update(doc, changes, version);
 
 				if (incremental) {
 					this._onDidChangeContent2.fire(event);
 				}
+
 				return result;
 			},
 		});
@@ -82,12 +92,15 @@ export class DocumentStore extends TextDocuments<TextDocument> {
 		if (result) {
 			return result;
 		}
+
 		let promise = this._fileDocuments.get(uri);
 
 		if (!promise) {
 			promise = this._requestDocument(uri);
+
 			this._fileDocuments.set(uri, promise);
 		}
+
 		return promise;
 	}
 

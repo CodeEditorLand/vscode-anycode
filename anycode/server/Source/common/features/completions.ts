@@ -25,6 +25,7 @@ export class CompletionItemProvider {
 				"outline",
 			]),
 		});
+
 		connection.onRequest(
 			lsp.CompletionRequest.type,
 			this.provideCompletionItems.bind(this),
@@ -53,6 +54,7 @@ export class CompletionItemProvider {
 
 		for (const capture of captures) {
 			const text = capture.node.text;
+
 			result.set(text, { label: text });
 		}
 
@@ -66,6 +68,7 @@ export class CompletionItemProvider {
 			for (const [, info] of map) {
 				if (info.definitions.size > 0) {
 					const [firstDefinitionKind] = info.definitions;
+
 					result.set(name, {
 						label: name,
 						kind: CompletionItemProvider._kindMapping.get(
