@@ -91,8 +91,8 @@
 	],
 	"dependencies": {},
 	"devDependencies": {
-		"@codeeditorland/test-web": "^0.0.53",
-		"@codeeditorland/vsce": "^2.24.0",
+		"@codeeditorland/test-web": "0.0.1",
+		"@codeeditorland/vsce": "0.0.1",
 		"@types/node": "^16.7.3",
 		"@typescript-eslint/eslint-plugin": "^4.14.1",
 		"@typescript-eslint/parser": "^4.14.1",
