@@ -27,8 +27,8 @@
 	},
 	"dependencies": {},
 	"devDependencies": {
-		"tree-sitter-cli": "^0.20.8",
-		"tree-sitter-rust": "^0.20.4"
+		"tree-sitter-cli": "0.20.8",
+		"tree-sitter-rust": "0.20.4"
 	},
 	"preview": true
 }
