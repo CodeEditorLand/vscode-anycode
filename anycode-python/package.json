@@ -1,20 +1,9 @@
 {
 	"name": "anycode-python",
 	"displayName": "anycode-python",
-	"version": "0.0.6",
 	"description": "Python for Anycode",
-	"categories": [
-		"Programming Languages"
-	],
-	"repository": {
-		"url": "https://github.com/microsoft/vscode-anycode"
-	},
-	"license": "MIT",
-	"publisher": "ms-vscode",
 	"scripts": {
-		"deploy": "npx vsce publish",
-		"postinstall": "npx tree-sitter build-wasm node_modules/tree-sitter-python",
-		"test": "node ../anycode/server/src/common/test-fixture/test.js  --outline ./fixtures/outline.ts --highlights ./fixtures/highlights.ts"
+		"deploy": "npx vsce publish"
 	},
 	"contributes": {
 		"anycodeLanguages": {
@@ -44,12 +33,8 @@
 	},
 	"dependencies": {},
 	"devDependencies": {
-		"@playwright/test": "^1.14.1",
 		"tree-sitter-cli": "^0.20.8",
 		"tree-sitter-python": "^0.20.4"
-	},
-	"engines": {
-		"vscode": "^1.67.0"
 	},
 	"preview": true
 }

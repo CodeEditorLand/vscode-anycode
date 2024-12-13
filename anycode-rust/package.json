@@ -1,20 +1,9 @@
 {
 	"name": "anycode-rust",
 	"displayName": "anycode-rust",
-	"version": "0.0.7",
 	"description": "Rust for Anycode",
-	"categories": [
-		"Programming Languages"
-	],
-	"repository": {
-		"url": "https://github.com/microsoft/vscode-anycode"
-	},
-	"license": "MIT",
-	"publisher": "ms-vscode",
 	"scripts": {
-		"deploy": "npx vsce publish",
-		"postinstall": "npx tree-sitter build-wasm node_modules/tree-sitter-rust",
-		"test": "node ../anycode/server/src/common/test-fixture/test.js --outline ./fixtures/outline.rs --highlights ./fixtures/highlights.rs"
+		"deploy": "npx vsce publish"
 	},
 	"contributes": {
 		"anycodeLanguages": {
@@ -40,9 +29,6 @@
 	"devDependencies": {
 		"tree-sitter-cli": "^0.20.8",
 		"tree-sitter-rust": "^0.20.4"
-	},
-	"engines": {
-		"vscode": "^1.67.0"
 	},
 	"preview": true
 }
