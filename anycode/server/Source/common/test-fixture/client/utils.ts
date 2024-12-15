@@ -119,9 +119,7 @@ export class Fixture {
 
 				for (
 					let row = capture.node.startPosition.row - 1;
-
 					row >= 0;
-
 					row--
 				) {
 					let node = tree.rootNode.descendantForPosition(

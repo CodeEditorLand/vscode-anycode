@@ -164,9 +164,7 @@ export class IndexedDBSymbolStorage implements SymbolInfoStorage {
 
 					for (
 						;
-
 						i < flatInfo.length && typeof flatInfo[i] === "number";
-
 						i++
 					) {}
 
