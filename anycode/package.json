@@ -81,8 +81,8 @@
 	"devDependencies": {
 		"@codeeditorland/test-web": "0.0.1",
 		"@codeeditorland/vsce": "0.0.1",
-		"@types/node": "16.7.3",
-		"esbuild": "0.15.12"
+		"@types/node": "22.10.5",
+		"esbuild": "0.24.2"
 	},
 	"extensionPack": [
 		"ms-vscode.anycode-c-sharp",
