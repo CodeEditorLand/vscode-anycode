@@ -81,7 +81,7 @@
 	"devDependencies": {
 		"@codeeditorland/test-web": "0.0.1",
 		"@codeeditorland/vsce": "0.0.1",
-		"@types/node": "22.10.7",
+		"@types/node": "22.10.9",
 		"esbuild": "0.24.2"
 	},
 	"extensionPack": [
