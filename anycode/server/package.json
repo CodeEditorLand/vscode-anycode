@@ -3,12 +3,9 @@
 	"scripts": {},
 	"dependencies": {},
 	"devDependencies": {
-		"@playwright/test": "^1.14.1",
 		"@types/assert": "^1.5.6",
 		"@types/chai": "^4.2.21",
-		"@types/mocha": "~10.0.10",
 		"assert": "~2.0.0",
-		"mocha": "~11.1.0",
 		"web-tree-sitter": "0.20.8",
 		"yargs": "^17.3.1"
 	}
